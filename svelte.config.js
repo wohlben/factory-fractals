@@ -14,7 +14,7 @@ const config = {
 			base: '/factory-fractals'
 		},
 		adapter: adapter({
-			fallback: 'index.html' // may differ from host to host
+			fallback: '404.html' // may differ from host to host
 		})
 		//adapter: adapter()
 	},
