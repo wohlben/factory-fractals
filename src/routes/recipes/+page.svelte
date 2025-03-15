@@ -4,6 +4,7 @@
 	import { derived } from 'svelte/store';
 	import { optionalCheckboxSvelte } from '$lib/client/optional-checkbox.svelte';
 	import RecipeSummary from '$lib/client/ui/components/recipe-sumamry.svelte';
+	import { LINKS } from '$lib';
 
 
 	let item = DSPData.item;
@@ -69,7 +70,7 @@
 
 {#each availableRecipes as recipe}
 	<div class="w-1/2 flex flex-col items-stretch group">
-		<div class="my-2 z-30"><a class="w-xs" href="/recipe/{recipe.ID}">{ recipe.Name }</a></div>
+		<div class="my-2 z-30"><a class="w-xs" href={LINKS.recipe(recipe.ID)}>{ recipe.Name }</a></div>
 
 		<div class="group-hover:overflow-visible overflow-clip h-0 z-40">
 			<RecipeSummary recipeId={recipe.ID}>

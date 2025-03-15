@@ -1,3 +1,7 @@
+<script>
+	import { LINKS } from '$lib';
+</script>
+
 <h1>Factory Fractals</h1>
 
-<a href="/recipes">list of recipes</a>
+<a href={LINKS.recipes()}>list of recipes</a>

@@ -10,6 +10,9 @@ const config = {
 	preprocess: [vitePreprocess(), mdsvex()],
 
 	kit: {
+		paths: {
+			base: '/factory-fractals'
+		},
 		adapter: adapter({
 			fallback: 'index.html' // may differ from host to host
 		})
