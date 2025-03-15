@@ -1,0 +1,1 @@
+import{t,a as e}from"../chunks/CMY6Seje.js";import"../chunks/CYgncC3i.js";import{n as o}from"../chunks/CsWNy0iH.js";var p=t('<h1>Factory Fractals</h1> <a href="/recipes">list of recipes</a>',1);function i(a){var r=p();o(2),e(a,r)}export{i as component};
