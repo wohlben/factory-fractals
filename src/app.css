@@ -1,0 +1,7 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+input, select, option {
+    @apply dark:text-white dark:bg-slate-950
+}
