@@ -52,9 +52,9 @@
 			<input type="number" class="text-left rounded-r-lg w-16" bind:value={amount}>
 		{:else }
 
-			<div class="flex items-center" >
-				<span class="pl-2">🗑</span>️
-				<span class="text-sm py-2 block pr-4" style="padding-left: {(planner.depth + 0.5) * 1.1 }rem">
+			<div class="flex items-center">
+				<span class="pl-2">🗑️</span>️
+				<span class="text-sm py-2 block pr-4" style="padding-left: {(planner.depth) * 1.1 }rem">
 					{Math.round($targetAmount * 100) / 100}
 				</span>
 			</div>
@@ -98,16 +98,18 @@
 					<Planner planner={child} deletecb={() => planner.deleteChild(mi)}></Planner>
 				{:else}
 					<div class="flex gap-2">
-						<button class="bg-slate-800 hover:bg-slate-700  text-center rounded-r-lg " onclick={() => planner.planFor(mi)}>
+						<button class="bg-slate-800 text-center rounded-r-lg"
+										class:hover:bg-slate-700={difference < 0 && DSPData.producedVia[mi]?.length > 0}
+										onclick={() => difference < 0 && DSPData.producedVia[mi]?.length > 0 && planner.planFor(mi)}>
 							{#if (difference < 0 && DSPData.producedVia[mi]?.length > 0)}
-								<div class="flex items-center" >
+								<div class="flex items-center">
 									<span class="pl-2">📝</span>️
 									<span class="text-sm py-2 block pr-4" style="padding-left: {((planner.depth + 0.5) * 1.1) }rem">
 				{Math.round(difference * 100) / 100}</span>
 								</div>
 							{:else if (mi !== $itemId && difference !== 0)}
 								<div class="flex items-center">
-									<span class="pl-4"></span>️
+									<span class="px-3.5"></span>️
 									<span class="text-sm py-2 block pr-4" style="padding-left: {((planner.depth + 0.5) * 1.1) }rem">
 				{Math.round(difference * 100) / 100}</span>
 								</div>
