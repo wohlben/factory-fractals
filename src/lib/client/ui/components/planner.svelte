@@ -42,19 +42,24 @@
 	});
 </script>
 <div class="flex gap-1 max-w-2xl items-center">
-	<div class="bg-slate-800  text-center rounded-r-lg  ">
+	<button onclick={() => deletecb()} class="bg-slate-800 hover:bg-slate-700  text-center rounded-r-lg  ">
 		{#if planner.amountEditable }
+			<style scoped>
+          input[type=number]::-webkit-inner-spin-button {
+              opacity: 1
+          }
+			</style>
 			<input type="number" class="text-left rounded-r-lg w-16" bind:value={amount}>
 		{:else }
 
-			<button class="flex items-center" onclick={() => deletecb()}>
+			<div class="flex items-center" >
 				<span class="pl-2">🗑</span>️
-				<span class="text-sm py-2 block pr-4" style="padding-left: {(planner.depth * 1.5) }rem">
+				<span class="text-sm py-2 block pr-4" style="padding-left: {(planner.depth + 0.5) * 1.1 }rem">
 					{Math.round($targetAmount * 100) / 100}
 				</span>
-			</button>
+			</div>
 		{/if}
-	</div>
+	</button>
 
 	<div class="flex-grow px-4"><h5>
 		{#if $itemId &&
@@ -93,21 +98,21 @@
 					<Planner planner={child} deletecb={() => planner.deleteChild(mi)}></Planner>
 				{:else}
 					<div class="flex gap-2">
-						<div class="bg-slate-800  text-center rounded-r-lg ">
+						<button class="bg-slate-800 hover:bg-slate-700  text-center rounded-r-lg " onclick={() => planner.planFor(mi)}>
 							{#if (difference < 0 && DSPData.producedVia[mi]?.length > 0)}
-								<button class="flex items-center" onclick={() => planner.planFor(mi)}>
+								<div class="flex items-center" >
 									<span class="pl-2">📝</span>️
-									<span class="text-sm py-2 block pr-4" style="padding-left: {((planner.depth + 1) * 1.5) }rem">
+									<span class="text-sm py-2 block pr-4" style="padding-left: {((planner.depth + 0.5) * 1.1) }rem">
 				{Math.round(difference * 100) / 100}</span>
-								</button>
+								</div>
 							{:else if (mi !== $itemId && difference !== 0)}
 								<div class="flex items-center">
 									<span class="pl-4"></span>️
-									<span class="text-sm py-2 block pr-4" style="padding-left: {((planner.depth + 1) * 1.5) }rem">
+									<span class="text-sm py-2 block pr-4" style="padding-left: {((planner.depth + 0.5) * 1.1) }rem">
 				{Math.round(difference * 100) / 100}</span>
 								</div>
 							{/if}
-						</div>
+						</button>
 
 
 						{#if (mi !== $itemId && difference !== 0)}

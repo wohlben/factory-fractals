@@ -168,7 +168,7 @@ export class RecipePlanner extends BasePlanner {
 	});
 
 
-	constructor(_recipeId: number | undefined, _itemId?: number, parentRequiredItemsPerInterval?: Readable<Record<number, number>>, targetInterval?: Readable<number>, public depth = 0) {
+	constructor(_recipeId: number | undefined, _itemId?: number, parentRequiredItemsPerInterval?: Readable<Record<number, number>>, targetInterval?: Readable<number>, public depth = 0, targetDepth=1, initTargetAmount?: number) {
 		const extractOrMinable = !!(_itemId && (DSPData.canBeExtracted[_itemId] || DSPData.canBeMined[_itemId]));
 
 		if (!_recipeId && !extractOrMinable) {
@@ -188,7 +188,7 @@ export class RecipePlanner extends BasePlanner {
 
 		const itemId = writable<number>(_itemId);
 
-		const manualAmount = writable<number>(recipe?.ResultCounts[itemIndex ?? 0] ?? 1);
+		const manualAmount = writable<number>(recipe?.ResultCounts[itemIndex ?? 0] ?? initTargetAmount ?? 1);
 
 		const targetAmount = parentRequiredItemsPerInterval ? derived([itemId, parentRequiredItemsPerInterval], ([itemId, parentRequiredItemsPerInterval]) => parentRequiredItemsPerInterval[itemId]) : manualAmount;
 
@@ -217,8 +217,8 @@ export class RecipePlanner extends BasePlanner {
 		this.manualAmount = manualAmount;
 		this.manualInterval = manualInterval;
 
-		if (!parentRequiredItemsPerInterval) {
-			this.children.set(this.dbd());
+		if (targetDepth > depth) {
+			this.children.set(this.dbd(targetDepth));
 		}
 
 	}
@@ -255,7 +255,7 @@ export class RecipePlanner extends BasePlanner {
 		});
 	}
 
-	dbd() {
+	dbd(targetDepth: number) {
 		const children: RecipePlanner[] = [];
 		const childrenProvideItemsPerInterval: Record<number, number> = {};
 		const recipe = get(this.recipe);
@@ -264,7 +264,7 @@ export class RecipePlanner extends BasePlanner {
 				return;
 			}
 
-			const planner = new RecipePlanner(undefined, citemId, this.requiredItemsPerInterval, this.targetInterval, this.depth + 1);
+			const planner = new RecipePlanner(undefined, citemId, this.requiredItemsPerInterval, this.targetInterval, this.depth + 1, targetDepth);
 			children.push(planner);
 			const providedItemsPerInterval = get(planner.providedItemsPerInterval);
 
