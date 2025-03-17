@@ -3,7 +3,6 @@
 	import { DSPData } from '$lib/client/dspdata.js';
 	import { derived } from 'svelte/store';
 	import { optionalCheckboxSvelte } from '$lib/client/optional-checkbox.svelte';
-	import RecipeSummary from '$lib/client/ui/components/recipe-sumamry.svelte';
 	import { LINKS } from '$lib';
 
 
@@ -16,6 +15,8 @@
 	let entityRecipes = optionalCheckboxSvelte();
 
 	let recipeName = $state('');
+
+	let moreFilter = $state(false);
 
 
 	let matchingItems = $derived(!recipeName ? [] : DSPData.items.filter(i => i.Name.toLowerCase().includes(recipeName.toLowerCase())).map(i => i.ID));
@@ -38,46 +39,38 @@
 		.filter(recipe => entityRecipes.checked === null ? true : entityRecipes.checked ? DSPData.entityRecipees.has(recipe.ID) : !DSPData.entityRecipees.has(recipe.ID))
 	);
 	let recipeTypes = new Set(DSPData.recipees.map(i => i.Type));
-	const ONE_MINUTE = 60 * 60; // a second is 60 for some reason
 </script>
 
+<div class="flex gap-0.5 flex-col mb-4 sticky top-0 mr-2 backdrop-blur-3xl backdrop-opacity-75  z-50">
+	{#if (moreFilter)}
+		<div class="flex w-full gap-2 ">
+			<label for="recipeType">type</label><select id="recipeType" bind:value={selectedTypes} multiple>
+			{#each recipeTypes as rt }
+				<option>{rt}</option>
+			{/each}
+		</select>
 
-<div class="flex w-full gap-2 ">
-
-	<select bind:value={selectedTypes} multiple>
-		{#each recipeTypes as rt }
-			<option>{rt}</option>
-		{/each}
-	</select>
-
-	<div class="flex flex-col gap-4 ">
-		<div class="flex gap-4 ">
-			<label>buildable <input type="checkbox" bind:checked={buildableRecipes.checked}></label>
-			<button class:opacity-0={!buildableRecipes.active} onclick={() => buildableRecipes.checked = null}>❌</button>
+			<div class="flex flex-col gap-4 ">
+				<div class="flex gap-4 ">
+					<label>buildable <input type="checkbox" bind:checked={buildableRecipes.checked}></label>
+					<button class:opacity-0={!buildableRecipes.active} onclick={() => buildableRecipes.checked = null}>❌</button>
+				</div>
+				<div class="flex gap-4 ">
+					<label>fluids <input type="checkbox" bind:checked={fluidRecipes.checked}></label>
+					<button class:opacity-0={!fluidRecipes.active} onclick={() => fluidRecipes.checked = null}>❌</button>
+				</div>
+				<div class="flex gap-4 ">
+					<label>entities <input type="checkbox" bind:checked={entityRecipes.checked}></label>
+					<button class:opacity-0={!entityRecipes.active} onclick={() => entityRecipes.checked = null}>❌</button>
+				</div>
+			</div>
 		</div>
-		<div class="flex gap-4 ">
-			<label>fluids <input type="checkbox" bind:checked={fluidRecipes.checked}></label>
-			<button class:opacity-0={!fluidRecipes.active} onclick={() => fluidRecipes.checked = null}>❌</button>
-		</div>
-		<div class="flex gap-4 ">
-			<label>entities <input type="checkbox" bind:checked={entityRecipes.checked}></label>
-			<button class:opacity-0={!entityRecipes.active} onclick={() => entityRecipes.checked = null}>❌</button>
-		</div>
-	</div>
-
-	<input bind:value={recipeName} />
+	{/if}
+	<label for="recipeName">ingredient or recipe name</label><input id=recipeName bind:value={recipeName} />
 </div>
 
 {#each availableRecipes as recipe}
-	<div class="w-1/2 flex flex-col items-stretch group">
+	<div class="flex flex-col items-stretch group w-full ">
 		<div class="my-2 z-30"><a class="w-xs" href={LINKS.recipe(recipe.ID)}>{ recipe.Name }</a></div>
-
-		<div class="group-hover:block hidden h-0 overflow-visible z-40">
-			<RecipeSummary recipeId={recipe.ID}>
-			</RecipeSummary>
-		</div>
-
 	</div>
-
-
 {/each}

@@ -1,5 +1,6 @@
 import { DSPData } from './dspdata';
-import { derived, get, readable, type Readable, type Writable, writable } from 'svelte/store';
+import { derived, get, type Readable, type Writable, writable } from 'svelte/store';
+import { FactoryGlobals } from '$lib/client/factory-globals';
 
 
 class BasePlanner {
@@ -7,7 +8,10 @@ class BasePlanner {
 	constructor(public recipeId: Writable<number>,
 							public itemId: Readable<number>,
 							public targetAmount: Readable<number>,
-							public targetInterval: Readable<number>
+							public targetInterval: Readable<number>,
+							public tier: Writable<number>,
+							public proliferator: Writable<number>,
+							public timeSpend: Readable<number>
 	) {
 	}
 }
@@ -25,6 +29,7 @@ export class RecipePlanner extends BasePlanner {
 	public amountEditable: boolean;
 
 	manualAmount = writable<number>();
+	manualInterval: Writable<number>;
 
 	children = writable<RecipePlanner[]>([]);
 
@@ -36,16 +41,23 @@ export class RecipePlanner extends BasePlanner {
 
 	options = derived(this.itemId, (itemId) => DSPData.alternativeRecipe[itemId]);
 
-	relativeSpeed = derived([this.targetInterval, this.recipe], ([targetInterval, recipe]) => targetInterval / recipe?.TimeSpend);
+	timeSpendChanged = derived(this.timeSpend, (timeSpend, set) => {
+		set(!!timeSpend);
+		const timeout = setTimeout(() => set(!timeSpend), 1400);
+		return () => clearTimeout(timeout);
+	});
 
-	requiredBuildings = derived([this.targetAmount, this.recipe, this.itemId, this.relativeSpeed], ([targetAmount, recipe, itemId, relativeSpeed]) => {
+	relativeSpeed = derived([this.targetInterval, this.timeSpend], ([targetInterval, timeSpend]) => targetInterval / timeSpend);
+
+	requiredBuildings = derived([this.targetAmount, this.recipe, this.itemId, this.relativeSpeed, this.proliferator], ([targetAmount, recipe, itemId, relativeSpeed, proliferator]) => {
 		const itemIndex = recipe?.Results.findIndex(i => itemId === i);
+
 		const result = targetAmount / recipe?.ResultCounts[itemIndex] / relativeSpeed;
 		return isNaN(result) ? targetAmount : result;
 	});
 
 	providedItemsPerInterval = derived([this.recipe, this.relativeSpeed, this.requiredBuildings, this.itemId, this.targetAmount], ([recipe, relativeSpeed, requiredBuildings, itemId, targetAmount]) => {
-		if (!recipe && itemId) {
+		if (!recipe && itemId && (DSPData.canBeMined[itemId] || DSPData.canBeExtracted[itemId])) {
 			return { [itemId]: targetAmount };
 		}
 
@@ -73,6 +85,30 @@ export class RecipePlanner extends BasePlanner {
 		const reducedValue = allProvisions.filter(i => !!i).reduce((acc, itms) => {
 			return tallyItems(acc, itms);
 		}, {} as Record<number, number>);
+		set(reducedValue);
+
+		// Return a cleanup function to unsubscribe from all child stores
+		return () => unsubscribes.forEach(unsubscribe => unsubscribe());
+	});
+
+	childrenByItemId: Readable<Record<number, RecipePlanner>> = derived(this.children, (children, set) => {
+		const allChildren: [number, RecipePlanner][] = new Array(children.length);
+
+		const unsubscribes = children.map((child, index) => {
+			return child.itemId.subscribe((itemId) => {
+				// Recalculate the reduced value whenever any child store changes
+				allChildren[index] = [itemId, child];
+				const reducedValue = allChildren.filter(i => !!i).reduce((acc, [itemId, planner]) => {
+					acc[itemId] = planner;
+					return acc;
+				}, {} as Record<number, RecipePlanner>);
+				set(reducedValue);
+			});
+		});
+		const reducedValue = allChildren.filter(i => !!i).reduce((acc, [itemId, planner]) => {
+			acc[itemId] = planner;
+			return acc;
+		}, {} as Record<number, RecipePlanner>);
 		set(reducedValue);
 
 		// Return a cleanup function to unsubscribe from all child stores
@@ -132,7 +168,7 @@ export class RecipePlanner extends BasePlanner {
 	});
 
 
-	constructor(_recipeId: number | undefined, _itemId?: number, parentRequiredItemsPerInterval?: Readable<Record<number, number>>, targetInterval?: Readable<number>) {
+	constructor(_recipeId: number | undefined, _itemId?: number, parentRequiredItemsPerInterval?: Readable<Record<number, number>>, targetInterval?: Readable<number>, public depth = 0) {
 		const extractOrMinable = !!(_itemId && (DSPData.canBeExtracted[_itemId] || DSPData.canBeMined[_itemId]));
 
 		if (!_recipeId && !extractOrMinable) {
@@ -156,19 +192,30 @@ export class RecipePlanner extends BasePlanner {
 
 		const targetAmount = parentRequiredItemsPerInterval ? derived([itemId, parentRequiredItemsPerInterval], ([itemId, parentRequiredItemsPerInterval]) => parentRequiredItemsPerInterval[itemId]) : manualAmount;
 
+		const tier = writable(recipe?.Type ? get(FactoryGlobals.defaultTier[recipe.Type]) : 1);
+		const proliferator = writable(get(FactoryGlobals.defaultTier.Proliferator));
+
+		const manualInterval = writable<number>(0);
+
+		const timeSpend = derived([recipeId, tier], ([recipeId, tier]) => DSPData.recipe[recipeId]?.TimeSpend / tier);
+
 		if (!targetInterval) {
-			targetInterval = readable(recipe?.TimeSpend);
+			targetInterval = derived([manualInterval, timeSpend], ([manual, ts]) => manual > 0 ? manual : ts);
 		}
 
 		super(
 			recipeId,
 			itemId,
 			targetAmount,
-			targetInterval
+			targetInterval,
+			tier,
+			proliferator,
+			timeSpend
 		);
 
 		this.amountEditable = amountEditable;
 		this.manualAmount = manualAmount;
+		this.manualInterval = manualInterval;
 
 		if (!parentRequiredItemsPerInterval) {
 			this.children.set(this.dbd());
@@ -185,8 +232,27 @@ export class RecipePlanner extends BasePlanner {
 		this.expand();
 	}
 
+	deleteChild(itemId: number) {
+		this.children.update(children => {
+			const index = children.findIndex(i => get(i.itemId) === itemId);
+			children.splice(index, 1);
+			return children;
+		});
+	}
+
+	setInterval(interval: number) {
+		this.manualInterval.set(interval);
+	}
+
 	expand() {
 		this.children.set(this.dbd());
+	}
+
+	planFor(itemId: number) {
+		this.children.update(children => {
+			children.push(new RecipePlanner(undefined, itemId, this.requiredItemsPerInterval, this.targetInterval, this.depth + 1));
+			return children;
+		});
 	}
 
 	dbd() {
@@ -198,7 +264,7 @@ export class RecipePlanner extends BasePlanner {
 				return;
 			}
 
-			const planner = new RecipePlanner(undefined, citemId, this.requiredItemsPerInterval, this.targetInterval);
+			const planner = new RecipePlanner(undefined, citemId, this.requiredItemsPerInterval, this.targetInterval, this.depth + 1);
 			children.push(planner);
 			const providedItemsPerInterval = get(planner.providedItemsPerInterval);
 

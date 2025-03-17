@@ -3,8 +3,9 @@
 	import Planner from './planner.svelte';
 	import Item from './item.svelte';
 	import { DSPData } from '$lib/client/dspdata';
+	import { FactoryGlobals } from '$lib/client/factory-globals';
 
-	let { planner } = $props<{ planner: RecipePlanner }>();
+	let { planner, deletecb } = $props<{ planner: RecipePlanner, deletecb?: () => void }>();
 
 	let {
 		item,
@@ -14,13 +15,15 @@
 		targetInterval,
 		requiredBuildings,
 		children,
+		childrenByItemId,
 		targetAmount,
 		childrenProvideItemsPerInterval,
 		providedItemsPerInterval,
 		requiredItemsPerInterval,
 		inputsOutputs,
 		deficit,
-		options
+		options,
+		tier
 	} = planner;
 
 
@@ -37,20 +40,23 @@
 			planner.setRecipeId(selectedRecipe);
 		}
 	});
-	$effect(() => {
-		console.log($recipeId);
-	});
 </script>
-
-<div class="flex gap-2 max-w-2xl">
-	<div>
+<div class="flex gap-1 max-w-2xl items-center">
+	<div class="bg-slate-800  text-center rounded-r-lg  ">
 		{#if planner.amountEditable }
-			<input type="number" class="w-12 text-right" bind:value={amount}>
+			<input type="number" class="text-left rounded-r-lg w-16" bind:value={amount}>
 		{:else }
-			<span>{$targetAmount}</span>
+
+			<button class="flex items-center" onclick={() => deletecb()}>
+				<span class="pl-2">🗑</span>️
+				<span class="text-sm py-2 block pr-4" style="padding-left: {(planner.depth * 1.5) }rem">
+					{Math.round($targetAmount * 100) / 100}
+				</span>
+			</button>
 		{/if}
 	</div>
-	<div><h5>
+
+	<div class="flex-grow px-4"><h5>
 		{#if $itemId &&
 		($options.length > 1 ||
 			($options.length >= 1 && DSPData.canBeExtracted[$itemId] || DSPData.canBeMined[$itemId])
@@ -72,40 +78,54 @@
 	</h5>
 
 	</div>
-	<span>in { $targetInterval / 60 }s</span>
 	{#if $requiredBuildings && $recipeId}
-		<span class="flex-grow text-right w-12"> { Math.round($requiredBuildings * 100) / 100 }</span>
+		<div>
+			{#each FactoryGlobals.availableTiers[$recipe.Type] as availableTier}
+				<button class="px-1" class:active={availableTier === $tier}
+								onclick={() => planner.tier.set(availableTier)}>{availableTier}</button>
+			{/each}
+		</div>
+		<span
+			class="text-center w-16 rounded-l-lg bg-slate-800 py-2 px-3"> { Math.round($requiredBuildings * 100) / 100 }</span>
 	{/if}
 </div>
 
-<div class="ml-4">
-
-	<div class="ml-4">
-
-		{#each $children as planner}
-			<Planner {planner}></Planner>
-		{/each}
-
-	</div>
-</div>
-
-<div class="ml-4">
-
-	<ul class="ml-4">
-
+{#if ($inputsOutputs?.size > 0)}
+	<div class="flex flex-col gap-0.5">
 		{#each $inputsOutputs as mi}
-			{@const difference = ($providedItemsPerInterval?.[mi] ?? 0) + ($childrenProvideItemsPerInterval?.[mi] ?? 0) - ($requiredItemsPerInterval?.[mi] ?? 0)}
+			{@const difference = ($providedItemsPerInterval?.[mi] ?? 0) + ($childrenProvideItemsPerInterval?.[mi] ?? 0) - ($requiredItemsPerInterval?.[mi] ?? 0) }
+			{@const child = $childrenByItemId[mi] }
+			{#key mi}
+				{#if child}
+					<Planner planner={child} deletecb={() => planner.deleteChild(mi)}></Planner>
+				{:else}
+					<div class="flex gap-2">
+						<div class="bg-slate-800  text-center rounded-r-lg ">
+							{#if (difference < 0 && DSPData.producedVia[mi]?.length > 0)}
+								<button class="flex items-center" onclick={() => planner.planFor(mi)}>
+									<span class="pl-2">📝</span>️
+									<span class="text-sm py-2 block pr-4" style="padding-left: {((planner.depth + 1) * 1.5) }rem">
+				{Math.round(difference * 100) / 100}</span>
+								</button>
+							{:else if (mi !== $itemId && difference !== 0)}
+								<div class="flex items-center">
+									<span class="pl-4"></span>️
+									<span class="text-sm py-2 block pr-4" style="padding-left: {((planner.depth + 1) * 1.5) }rem">
+				{Math.round(difference * 100) / 100}</span>
+								</div>
+							{/if}
+						</div>
 
-			{#if (mi !== $itemId && difference !== 0)}
-				<li class:text-green-500={(difference > 0)}
-						class:text-red-500={difference < 0}>
-					{difference} <Item itemId={mi} /> / {$targetInterval / 60}s
-				</li>
-			{/if}
+
+						{#if (mi !== $itemId && difference !== 0)}
+							<div class="flex gap-2 items-center" class:text-green-500={(difference > 0)}
+									 class:text-red-500={difference < 0}>
+								<Item itemId={mi} />
+							</div>
+						{/if}
+					</div>
+				{/if}
+			{/key}
 		{/each}
-		{#if (Object.keys($deficit).length > 0)}
-			<button onclick={() => planner.expand()}> DRILL BABY DRILL</button>
-		{/if}
-	</ul>
-
-</div>
+	</div>
+{/if}
