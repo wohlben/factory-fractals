@@ -2,8 +2,8 @@
 	import type { RecipePlanner } from '$lib/client/recipePlanner';
 	import Planner from './planner.svelte';
 	import Item from './item.svelte';
+	import TierPicker from './tier-picker.svelte';
 	import { DSPData } from '$lib/client/dspdata';
-	import { FactoryGlobals } from '$lib/client/factory-globals';
 
 	let { planner, deletecb } = $props<{ planner: RecipePlanner, deletecb?: () => void }>();
 
@@ -79,14 +79,7 @@
 
 	</div>
 	{#if $requiredBuildings && $recipeId}
-		<div>
-			{#each FactoryGlobals.availableTiers[$recipe.Type] as availableTier}
-				<button class="px-1" class:active={availableTier === $tier}
-								onclick={() => planner.tier.set(availableTier)}>{availableTier}</button>
-			{/each}
-		</div>
-		<span
-			class="text-center w-16 rounded-l-lg bg-slate-800 py-2 px-3"> { Math.round($requiredBuildings * 100) / 100 }</span>
+		<TierPicker planner={planner}></TierPicker>
 	{/if}
 </div>
 

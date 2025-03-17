@@ -20,6 +20,8 @@
 	};
 </script>
 
+<h3 class="bg-blue-800  rounded-t py-5 px-4">default tier for new factory of type</h3>
+
 <div>
 	<h4 class="bg-blue-900 py-2 px-4 rounded-t">Smelting</h4>
 	<div class="flex bg-gray-600 ">

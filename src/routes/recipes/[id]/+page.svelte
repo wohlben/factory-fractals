@@ -41,7 +41,7 @@
 						<button class="px-1.5 multi" class:animate-flash={$timeSpendChanged}
 										class:active={$targetInterval === $timeSpend}
 										onclick={() => planner.setInterval(0)}>
-							Cycle ({ $timeSpend / 60 }s)
+							Cycle ({ Math.round($timeSpend / 60 * 100) / 100 }s)
 						</button>
 
 		      <button class="px-1.5 multi" class:active={$targetInterval === ONE_MINUTE}
@@ -53,8 +53,8 @@
 			</span>
 
 	 </span>
-			<button class="px-3 py-3 flex-grow text-right" onclick={() => dialogOpen = true}>⚙️</button>
-			<span class="px-3 py-3 bg-slate-800 rounded-l-lg">Required Fabs to Process Items</span>
+			<span class="px-3 py-3 flex-grow text-right" ></span>
+			<button class="px-3 py-3 bg-slate-800 rounded-l-lg" onclick={() => dialogOpen = true}> ⚙️ Required Fabs to Process Items</button>
 		</div>
 
 		{#key planner}
