@@ -20,7 +20,7 @@ const tallyItems = (a: Record<number, number>, b: Record<number, number>): Recor
 	const tallied = { ...a };
 	Object.entries(b).forEach(([key, value]) => {
 		const itemId = Number(key);
-		tallied[itemId] = value;
+		tallied[itemId] = (tallied[itemId] ?? 0) + value;
 	});
 	return tallied;
 };
@@ -90,6 +90,39 @@ export class RecipePlanner extends BasePlanner {
 		// Return a cleanup function to unsubscribe from all child stores
 		return () => unsubscribes.forEach(unsubscribe => unsubscribe());
 	});
+
+
+	requiredBuildingsByItemId: Readable<Record<number, number>> = derived([this.children, this.itemId, this.recipe, this.requiredBuildings], ([children, itemId, recipe, requiredBuildings], set) => {
+		const allRequiredBuildings: Record<number, number>[] = new Array(children.length);
+
+
+		const unsubscribes = children.map((child, index) => {
+			return child.requiredBuildingsByItemId.subscribe((rb) => {
+				// Recalculate the reduced value whenever any child store changes
+				allRequiredBuildings[index] = rb;
+				const reducedValue = allRequiredBuildings.filter(i => !!i).reduce((acc, childrenRequiredBuildings) => {
+					return tallyItems(acc, childrenRequiredBuildings);
+				}, { } as Record<number, number>);
+				if (recipe) {
+					const iId = itemId ?? recipe.Results[0];
+					reducedValue[iId] = (reducedValue[iId] ?? 0) + requiredBuildings
+				}
+				set(reducedValue);
+			});
+		});
+		const reducedValue = allRequiredBuildings.filter(i => !!i).reduce((acc, childrenRequiredBuildings) => {
+			return tallyItems(acc, childrenRequiredBuildings);
+		}, {} as Record<number, number>);
+		if (recipe) {
+			const iId = itemId ?? recipe.Results[0];
+			reducedValue[iId] = (reducedValue[iId] ?? 0) + requiredBuildings
+		}
+		set(reducedValue);
+
+		// Return a cleanup function to unsubscribe from all child stores
+		return () => unsubscribes.forEach(unsubscribe => unsubscribe());
+	});
+
 
 	childrenByItemId: Readable<Record<number, RecipePlanner>> = derived(this.children, (children, set) => {
 		const allChildren: [number, RecipePlanner][] = new Array(children.length);
@@ -168,7 +201,7 @@ export class RecipePlanner extends BasePlanner {
 	});
 
 
-	constructor(_recipeId: number | undefined, _itemId?: number, parentRequiredItemsPerInterval?: Readable<Record<number, number>>, targetInterval?: Readable<number>, public depth = 0, targetDepth=1, initTargetAmount?: number) {
+	constructor(_recipeId: number | undefined, _itemId?: number, parentRequiredItemsPerInterval?: Readable<Record<number, number>>, targetInterval?: Readable<number>, public depth = 0, targetDepth = 1, initTargetAmount?: number) {
 		const extractOrMinable = !!(_itemId && (DSPData.canBeExtracted[_itemId] || DSPData.canBeMined[_itemId]));
 
 		if (!_recipeId && !extractOrMinable) {
@@ -255,7 +288,7 @@ export class RecipePlanner extends BasePlanner {
 		});
 	}
 
-	dbd(targetDepth: number) {
+	dbd(targetDepth?: number) {
 		const children: RecipePlanner[] = [];
 		const childrenProvideItemsPerInterval: Record<number, number> = {};
 		const recipe = get(this.recipe);

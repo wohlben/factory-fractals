@@ -7,6 +7,7 @@
 	import FactoryGlobalsC from '$lib/client/ui/components/factory-globals.svelte';
 	import { FactoryGlobals } from '$lib/client/factory-globals';
 	import { derived, get } from 'svelte/store';
+	import Tally from '$lib/client/ui/components/tally.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -50,7 +51,7 @@
 		<RecipeList></RecipeList>
 	</div>
 
-	<div class="max-w-2xl w-full mr-auto ml-auto lg:ml-0">
+	<div class="max-w-2xl w-full lg:mx-0 mx-auto">
 		<div class="flex  text-sm py-1">
 		<span class="px-3 py-1 bg-slate-800 rounded-r-lg">Items per
 			<span class="inline-flex">
@@ -80,6 +81,8 @@
 		{/key}
 
 	</div>
+
+	<Tally planner={planner} />
 
 
 </div>
