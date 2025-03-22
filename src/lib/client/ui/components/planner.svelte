@@ -60,7 +60,7 @@
 {/if}
 
 <div class="flex gap-1 max-w-2xl items-center hover:bg-gray-700">
-	<button onclick={() => deletecb()} class="bg-slate-800 hover:bg-red-700  text-center rounded-r-lg  ">
+	<button class:hover:bg-red-700={!planner.amountEditable}   onclick={() => deletecb?.()} class="bg-slate-800  text-center rounded-r-lg  ">
 		{#if planner.amountEditable }
 			<style scoped>
           input::-webkit-outer-spin-button,

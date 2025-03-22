@@ -50,9 +50,9 @@
 	</dialog>
 {/if}
 
-<div class="flex gap-12">
+<div class="flex gap-12 flex-wrap lg:flex-nowrap">
 
-	<div class="max-w-sm lg:block hidden max-h-screen  ml-auto overflow-y-auto">
+	<div class="lg:max-w-sm lg:block hidden max-h-screen  ml-auto overflow-y-auto">
 		<RecipeList></RecipeList>
 	</div>
 

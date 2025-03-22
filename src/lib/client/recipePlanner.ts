@@ -127,7 +127,7 @@ export class RecipePlanner extends BasePlanner {
 		return Object.entries(rb).reduce((acc, [key, fabs]) => {
 			const recipeId = Number(key);
 			const recipeType = DSPData.recipe[recipeId].Type;
-			acc[recipeType] = (acc[recipeType] ?? 0) + Math.round(fabs);
+			acc[recipeType] = (acc[recipeType] ?? 0) + Math.ceil(fabs);
 			return acc;
 		}, {} as Record<string, number>);
 	});

@@ -13,7 +13,7 @@
 	let {defaultTier} = FactoryGlobals;
 
 </script>
-<div class="max-w-sm flex flex-col mr-auto gap-0.5">
+<div class="md:max-w-sm w-full flex flex-col mx-auto lg:ml-0 gap-0.5">
 	<h4 class="px-4 py-2 bg-slate-800 rounded-t-lg">all required buildings</h4>
 	{#key $itemId}
 		{#each Object.entries($requiredBuildingsByRecipeId) as allRequiredBuildings}
