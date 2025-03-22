@@ -10,6 +10,7 @@
 		planner.tier.set(availableTier);
 		tierSelector = false;
 	}
+
 </script>
 {#if (tierSelector)}
 	<div>

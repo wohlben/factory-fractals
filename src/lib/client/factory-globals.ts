@@ -1,35 +1,37 @@
-import { writable, type Writable } from 'svelte/store';
-import { browser } from "$app/environment"
+import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
+import type { RecipeType } from '$lib/client/dspdata';
 
-const preValue = (key: string, defalt: number) => {
-	const pv =  browser &&  localStorage?.getItem(`dt.${key}`);
-	if (pv) {
-		return writable(parseFloat(pv))
+const preValue = () => {
+	const storedItem = browser && localStorage?.getItem(`defaultTiers`);
+	if (storedItem) {
+		const storedValue: Record<RecipeType, number> = JSON.parse(storedItem);
+		return writable(storedValue);
 	}
-	return writable(defalt);
-}
+	return undefined;
+};
 
 export const FactoryGlobals = {
-	defaultTier: {
-		Smelt: preValue("Smelt", 1),
-		Assemble: preValue('Assemble', 0.75),
-		Research: preValue('Research', 1),
-		Chemical: preValue('Chemical', 1),
-		Refine: preValue('Refine', 1),
-		Particle: preValue('Particle', 1),
-		Fractionate: preValue('Fractionate', 1),
-		Proliferator: preValue('Proliferator', 1)
-	} as Record<string, Writable<number>>,
+	defaultTier: preValue() ?? writable<Record<RecipeType, number>>({
+		Smelt: 1,
+		Assemble: 0.75,
+		Research: 1,
+		Chemical: 1,
+		Refine: 1,
+		Particle: 1,
+		Fractionate: 1,
+		Proliferator: 1
+	}),
 	availableTiers: {
 		Smelt: [1, 2],
 		Assemble: [0.75, 1, 1.5, 3],
 		Research: [1],
 		Refine: [1],
-		Chemical: [1],
+		Chemical: [1, 2],
 		Particle: [1],
 		Fractionate: [1],
 		Proliferator: [0.125, 0.2, 0.25]
-	} as Record<'Smelt' | 'Assemble' | 'Research' | 'Refine' | 'Chemical' | 'Particle' | 'Fractionate' | 'Proliferator', number[]>,
+	} as Record<RecipeType, number[]>,
 	proliferatorUsage: {
 		[0.125]: 12,
 		[0.2]: 24,

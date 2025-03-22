@@ -11,6 +11,9 @@
 
 	let { data }: PageProps = $props();
 
+	let { defaultTier } = FactoryGlobals;
+
+
 	let planner = $derived(new RecipePlanner(data.recipeId, undefined, undefined, undefined, undefined, data.depth, data.targetAmount));
 	let { targetInterval, recipe, timeSpend, timeSpendChanged, tier, children } = $derived(planner);
 
@@ -18,15 +21,16 @@
 	let dialogOpen = $state(false);
 
 
+
 	const applyToAll = (pnr?: RecipePlanner) => {
 		if (!pnr) pnr = planner;
-		const recipe = get(pnr.recipe);
+		const recipe = get(pnr!.recipe);
 		if (recipe) {
 			const recipeType = recipe.Type;
-			const currentDefault = get(FactoryGlobals.defaultTier[recipeType]);
-			pnr.tier.set(currentDefault);
+			const currentDefault = $defaultTier[recipeType];
+			pnr!.tier.set(currentDefault);
 		}
-		get(pnr.children).forEach(child => applyToAll(child));
+		get(pnr!.children).forEach(child => applyToAll(child));
 
 		dialogOpen = false;
 	};
@@ -40,7 +44,8 @@
 
 		<span class="flex-grow"></span>
 		<button class="bg-green-800 hover:bg-green-700 w-full py-1" onclick={() => applyToAll()}>apply to existing</button>
-		<button class="bg-green-800 hover:bg-green-700 w-full py-1" onclick={() => dialogOpen = false}>apply to future</button>
+		<button class="bg-green-800 hover:bg-green-700 w-full py-1" onclick={() => dialogOpen = false}>apply to future
+		</button>
 
 	</dialog>
 {/if}
@@ -71,7 +76,8 @@
 
 	 </span>
 			<span class="px-3 py-3 flex-grow text-right"></span>
-			<button class="px-3 py-3 bg-slate-800 hover:bg-slate-700 rounded-l-lg" onclick={() => dialogOpen = true}> ⚙️ Required Fabs to Process
+			<button class="px-3 py-3 bg-slate-800 hover:bg-slate-700 rounded-l-lg" onclick={() => dialogOpen = true}> ⚙️
+				Required Fabs to Process
 				Items
 			</button>
 		</div>

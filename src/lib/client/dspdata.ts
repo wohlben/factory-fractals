@@ -21,11 +21,22 @@ export interface ItemType {
 	'Description': string
 }
 
+export type RecipeType =
+	'Smelt'
+	| 'Assemble'
+	| 'Research'
+	| 'Chemical'
+	| 'Refine'
+	| 'Particle'
+	| 'Fractionate'
+	| 'Proliferator'
+ | string
+
 export interface RecipeeType {
 	'Name': string,
 	'ID': number,
 	'SID': string //"1101",
-	'Type': string // "Smelt",
+	'Type': RecipeType
 	'TimeSpend': number //60,
 	'Items': number[],
 	'ItemCounts': number[],

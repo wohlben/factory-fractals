@@ -92,20 +92,20 @@ export class RecipePlanner extends BasePlanner {
 	});
 
 
-	requiredBuildingsByItemId: Readable<Record<number, number>> = derived([this.children, this.itemId, this.recipe, this.requiredBuildings], ([children, itemId, recipe, requiredBuildings], set) => {
+	requiredBuildingsByRecipeId: Readable<Record<number, number>> = derived([this.children, this.recipeId, this.requiredBuildings], ([children, recipe, requiredBuildings], set) => {
 		const allRequiredBuildings: Record<number, number>[] = new Array(children.length);
 
 
 		const unsubscribes = children.map((child, index) => {
-			return child.requiredBuildingsByItemId.subscribe((rb) => {
+			return child.requiredBuildingsByRecipeId.subscribe((rb) => {
 				// Recalculate the reduced value whenever any child store changes
 				allRequiredBuildings[index] = rb;
 				const reducedValue = allRequiredBuildings.filter(i => !!i).reduce((acc, childrenRequiredBuildings) => {
 					return tallyItems(acc, childrenRequiredBuildings);
-				}, { } as Record<number, number>);
+				}, {} as Record<number, number>);
 				if (recipe) {
-					const iId = itemId ?? recipe.Results[0];
-					reducedValue[iId] = (reducedValue[iId] ?? 0) + requiredBuildings
+					const iId = recipe;
+					reducedValue[iId] = (reducedValue[iId] ?? 0) + requiredBuildings;
 				}
 				set(reducedValue);
 			});
@@ -114,14 +114,23 @@ export class RecipePlanner extends BasePlanner {
 			return tallyItems(acc, childrenRequiredBuildings);
 		}, {} as Record<number, number>);
 		if (recipe) {
-			const iId = itemId ?? recipe.Results[0];
-			reducedValue[iId] = (reducedValue[iId] ?? 0) + requiredBuildings
+			const iId = recipe;
+			reducedValue[iId] = (reducedValue[iId] ?? 0) + requiredBuildings;
 		}
 		set(reducedValue);
 
 		// Return a cleanup function to unsubscribe from all child stores
 		return () => unsubscribes.forEach(unsubscribe => unsubscribe());
 	});
+
+	fabsByType = derived(this.requiredBuildingsByRecipeId, (rb) => {
+		return Object.entries(rb).reduce((acc, [key, fabs]) => {
+			const recipeId = Number(key);
+			const recipeType = DSPData.recipe[recipeId].Type;
+			acc[recipeType] = (acc[recipeType] ?? 0) + fabs;
+			return acc;
+		}, {} as Record<string, number>)
+	})
 
 
 	childrenByItemId: Readable<Record<number, RecipePlanner>> = derived(this.children, (children, set) => {
@@ -225,8 +234,8 @@ export class RecipePlanner extends BasePlanner {
 
 		const targetAmount = parentRequiredItemsPerInterval ? derived([itemId, parentRequiredItemsPerInterval], ([itemId, parentRequiredItemsPerInterval]) => parentRequiredItemsPerInterval[itemId]) : manualAmount;
 
-		const tier = writable(recipe?.Type ? get(FactoryGlobals.defaultTier[recipe.Type]) : 1);
-		const proliferator = writable(get(FactoryGlobals.defaultTier.Proliferator));
+		const tier = writable(recipe?.Type ? get(FactoryGlobals.defaultTier)[recipe.Type] : 1);
+		const proliferator = writable(get(FactoryGlobals.defaultTier).Proliferator);
 
 		const manualInterval = writable<number>(0);
 

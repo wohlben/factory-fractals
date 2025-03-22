@@ -3,6 +3,7 @@
 	import Planner from './planner.svelte';
 	import Item from './item.svelte';
 	import TierPicker from './tier-picker.svelte';
+	import PlannerDetail from './planner-details.svelte';
 	import { DSPData } from '$lib/client/dspdata';
 
 	let { planner, deletecb } = $props<{ planner: RecipePlanner, deletecb?: () => void }>();
@@ -30,6 +31,7 @@
 	let amount = $state($targetAmount);
 	let selectedRecipe = $state($recipeId);
 
+	let detailDialog = $state(false);
 
 	$effect(() => {
 		if (planner.amountEditable && $targetAmount !== amount)
@@ -41,12 +43,30 @@
 		}
 	});
 </script>
+
+{#if (detailDialog)}
+	<dialog  open
+					 class="max-w-2xl w-full h-full max-h-10/12 mx-auto top-1/12 bg-gray-950 z-50 md:px-5 text-amber-50 flex flex-col py-4 gap-2">
+
+		<PlannerDetail planner={planner}></PlannerDetail>
+		<button class="bg-green-800 py-2 rounded-xl mt-auto" onclick={() => detailDialog = false}>close</button>
+
+	</dialog>
+{/if}
+
 <div class="flex gap-1 max-w-2xl items-center">
 	<button onclick={() => deletecb()} class="bg-slate-800 hover:bg-slate-700  text-center rounded-r-lg  ">
 		{#if planner.amountEditable }
 			<style scoped>
-          input[type=number]::-webkit-inner-spin-button {
-              opacity: 1
+          input::-webkit-outer-spin-button,
+          input::-webkit-inner-spin-button {
+              /* display: none; <- Crashes Chrome on hover */
+              -webkit-appearance: none;
+              margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+          }
+
+          input[type=number] {
+              -moz-appearance: textfield;
           }
 			</style>
 			<input type="number" class="text-left rounded-r-lg w-16" bind:value={amount}>
@@ -61,7 +81,7 @@
 		{/if}
 	</button>
 
-	<div class="flex-grow px-4"><h5>
+	<div class="flex-grow px-4"><h5 class="flex">
 		{#if $itemId &&
 		($options.length > 1 ||
 			($options.length >= 1 && DSPData.canBeExtracted[$itemId] || DSPData.canBeMined[$itemId])
@@ -78,7 +98,11 @@
 				{/each}
 			</select>
 		{:else}
-			{ $recipe?.Name }
+			<span class="flex-grow">{ $recipe?.Name }</span>
+			{#if $children.length > 1 && !planner.amountEditable}
+				<button class="py-1 rounded-xl px-4 bg-slate-800" onclick={() => detailDialog = true}>🚧
+				</button>
+			{/if}
 		{/if}
 	</h5>
 
