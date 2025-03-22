@@ -25,8 +25,8 @@
 				{@const outputsPerSecond = requiredBuildings * relativeSpeed * resultCounts * 60}
 				<div class="flex odd:bg-gray-950 gap-2 px-2">
 					<span class="flex-grow">{recipe?.Name ?? "recipe" + recipeId }</span>
-					<span>{requiredBuildings}</span>
-					<em>{outputsPerSecond}/s</em>
+					<span>{Math.round(requiredBuildings * 100) / 100}</span>
+					<em>{Math.round(outputsPerSecond * 100) / 100}/s</em>
 				</div>
 			{/if}
 
