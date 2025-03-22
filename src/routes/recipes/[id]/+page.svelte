@@ -21,7 +21,6 @@
 	let dialogOpen = $state(false);
 
 
-
 	const applyToAll = (pnr?: RecipePlanner) => {
 		if (!pnr) pnr = planner;
 		const recipe = get(pnr!.recipe);
@@ -87,9 +86,9 @@
 		{/key}
 
 	</div>
-
-	<Tally planner={planner} />
-
+	{#key planner}
+		<Tally planner={planner} />
+	{/key}
 
 </div>
 
