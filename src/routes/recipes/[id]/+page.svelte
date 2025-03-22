@@ -21,6 +21,7 @@
 	let dialogOpen = $state(false);
 
 
+
 	const applyToAll = (pnr?: RecipePlanner) => {
 		if (!pnr) pnr = planner;
 		const recipe = get(pnr!.recipe);

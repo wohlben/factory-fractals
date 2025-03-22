@@ -5,6 +5,7 @@
 	import TierPicker from './tier-picker.svelte';
 	import PlannerDetail from './planner-details.svelte';
 	import { DSPData } from '$lib/client/dspdata';
+	import { LINKS } from '$lib';
 
 	let { planner, deletecb } = $props<{ planner: RecipePlanner, deletecb?: () => void }>();
 
@@ -14,6 +15,7 @@
 		recipe,
 		recipeId,
 		targetInterval,
+		relativeSpeed,
 		requiredBuildings,
 		children,
 		childrenByItemId,
@@ -101,7 +103,7 @@
 				{/each}
 			</select>
 		{:else}
-			<span class="flex-grow">{ $recipe?.Name }</span>
+			<span class="flex-grow">{ $recipe?.Name } <a class="bg-gray-800 hover:bg-slate-700" href={LINKS.recipe($recipe.ID) + "?targetAmount=" + Math.round($requiredBuildings) + "&depth=" + 10}>➡️</a></span>
 			{#if $children.length > 1 && !planner.amountEditable}
 				<button class="py-1 rounded-xl px-4 bg-slate-800 hover:bg-slate-700" onclick={() => detailDialog = true}>🔎</button>
 			{/if}
