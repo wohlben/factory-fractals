@@ -16,7 +16,7 @@
 	<div>
 		<span class="text-xs text-gray-400">Tier</span>
 		{#each FactoryGlobals.availableTiers[$recipe.Type] as availableTier}
-			<button class="px-2 py-1 outline-slate-600 hover:bg-slate-700 text-sm  rounded" class:outline-1={availableTier === $tier}
+			<button class="px-2 py-1 outline-slate-600 hover:bg-slate-600 text-sm  rounded" class:outline-1={availableTier === $tier}
 							class:active={availableTier === $tier}
 							onclick={() => switchTier(availableTier)}>{availableTier}</button>
 		{/each}
@@ -24,7 +24,7 @@
 	{:else}
 	<button
 		onclick={() => tierSelector = true}
-		class="text-center min-w-16 h-10 rounded-l-lg bg-slate-800 hover:bg-slate-700 py-2 px-3 flex justify-around items-end gap-2 relative ">
+		class="text-center min-w-16 h-10 rounded-l-lg bg-slate-800 hover:bg-slate-600 py-2 px-3 flex justify-around items-end gap-2 relative ">
 			<span  class="text-xs text-gray-400 absolute top-0">tier {$tier}</span>
 			<b class="bottom-0.5 absolute">{Math.round($requiredBuildings * 100) / 100}</b>
 	</button>

@@ -46,16 +46,19 @@
 
 {#if (detailDialog)}
 	<dialog  open
-					 class="max-w-2xl w-full h-full max-h-10/12 mx-auto top-1/12 bg-gray-950 z-50 md:px-5 text-amber-50 flex flex-col py-4 gap-2">
+					 class="max-w-2xl w-full h-full max-h-10/12 mx-auto top-1/12 bg-gray-950 z-50 md:px-5 text-amber-50 flex flex-col py-4 gap-2 fixed ">
 
 		<PlannerDetail planner={planner}></PlannerDetail>
-		<button class="bg-green-800 py-2 rounded-xl mt-auto" onclick={() => detailDialog = false}>close</button>
-
+		<button class="bg-green-800 hover:bg-green-700 py-2 rounded-xl mt-auto" onclick={() => detailDialog = false}>close</button>
 	</dialog>
+
+	<button onclick={() => detailDialog = false} class="fixed overscroll-contain w-screen h-screen backdrop-blur-2xl bg-black opacity-70 top-0 left-0 z-40" aria-label="close">
+	</button>
+
 {/if}
 
-<div class="flex gap-1 max-w-2xl items-center">
-	<button onclick={() => deletecb()} class="bg-slate-800 hover:bg-slate-700  text-center rounded-r-lg  ">
+<div class="flex gap-1 max-w-2xl items-center hover:bg-gray-700">
+	<button onclick={() => deletecb()} class="bg-slate-800 hover:bg-red-700  text-center rounded-r-lg  ">
 		{#if planner.amountEditable }
 			<style scoped>
           input::-webkit-outer-spin-button,
@@ -100,8 +103,7 @@
 		{:else}
 			<span class="flex-grow">{ $recipe?.Name }</span>
 			{#if $children.length > 1 && !planner.amountEditable}
-				<button class="py-1 rounded-xl px-4 bg-slate-800" onclick={() => detailDialog = true}>🚧
-				</button>
+				<button class="py-1 rounded-xl px-4 bg-slate-800 hover:bg-slate-700" onclick={() => detailDialog = true}>🔎</button>
 			{/if}
 		{/if}
 	</h5>
@@ -113,7 +115,7 @@
 </div>
 
 {#if ($inputsOutputs?.size > 0)}
-	<div class="flex flex-col gap-0.5">
+	<div class="flex flex-col gap-0.5 ">
 		{#each $inputsOutputs as mi}
 			{@const difference = ($providedItemsPerInterval?.[mi] ?? 0) + ($childrenProvideItemsPerInterval?.[mi] ?? 0) - ($requiredItemsPerInterval?.[mi] ?? 0) }
 			{@const child = $childrenByItemId[mi] }
@@ -121,9 +123,9 @@
 				{#if child}
 					<Planner planner={child} deletecb={() => planner.deleteChild(mi)}></Planner>
 				{:else}
-					<div class="flex gap-2">
-						<button class="bg-slate-800 text-center rounded-r-lg"
-										class:hover:bg-slate-700={difference < 0 && DSPData.producedVia[mi]?.length > 0}
+					<div class="flex gap-2 hover:bg-gray-700">
+						<button class="bg-slate-800  text-center rounded-r-lg"
+										class:hover:bg-green-800={difference < 0 && DSPData.producedVia[mi]?.length > 0}
 										onclick={() => difference < 0 && DSPData.producedVia[mi]?.length > 0 && planner.planFor(mi)}>
 							{#if (difference < 0 && DSPData.producedVia[mi]?.length > 0)}
 								<div class="flex items-center">
@@ -142,7 +144,7 @@
 
 
 						{#if (mi !== $itemId && difference !== 0)}
-							<div class="flex gap-2 items-center" class:text-green-500={(difference > 0)}
+							<div class="flex gap-2 items-center " class:text-green-500={(difference > 0)}
 									 class:text-red-500={difference < 0}>
 								<Item itemId={mi} />
 							</div>

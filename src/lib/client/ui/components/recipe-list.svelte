@@ -41,7 +41,7 @@
 	let recipeTypes = new Set(DSPData.recipees.map(i => i.Type));
 </script>
 
-<div class="flex gap-0.5 flex-col mb-4 sticky top-0 mr-2 backdrop-blur-3xl backdrop-opacity-75  z-50">
+<div class="flex gap-0.5 flex-col mb-4 sticky top-0 mr-2 backdrop-blur-3xl backdrop-opacity-75  z-40">
 	{#if (moreFilter)}
 		<div class="flex w-full gap-2 ">
 			<label for="recipeType">type</label><select id="recipeType" bind:value={selectedTypes} multiple>

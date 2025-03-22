@@ -127,10 +127,10 @@ export class RecipePlanner extends BasePlanner {
 		return Object.entries(rb).reduce((acc, [key, fabs]) => {
 			const recipeId = Number(key);
 			const recipeType = DSPData.recipe[recipeId].Type;
-			acc[recipeType] = (acc[recipeType] ?? 0) + fabs;
+			acc[recipeType] = (acc[recipeType] ?? 0) + Math.round(fabs);
 			return acc;
-		}, {} as Record<string, number>)
-	})
+		}, {} as Record<string, number>);
+	});
 
 
 	childrenByItemId: Readable<Record<number, RecipePlanner>> = derived(this.children, (children, set) => {
@@ -164,6 +164,11 @@ export class RecipePlanner extends BasePlanner {
 		return requiredItemsPerInterval;
 	});
 
+	deficitRequiredItemsPerInterval = derived([this.recipe, this.relativeSpeed, this.requiredBuildings], ([recipe, relativeSpeed, requiredBuildings]) => {
+			const requiredItemsPerInterval: Record<number, number> = {};
+			recipe?.Items.forEach((itemId, index) => requiredItemsPerInterval[itemId] = -(recipe.ItemCounts[index] * relativeSpeed * requiredBuildings));
+			return requiredItemsPerInterval;
+		});
 	inputsOutputs = derived([this.childrenProvideItemsPerInterval, this.requiredItemsPerInterval, this.providedItemsPerInterval], ([providedItemsPerInterval, requiredItemsPerInterval, providedItems]) => {
 		const itemIds = new Set<number>();
 		Object.keys(requiredItemsPerInterval).forEach((itemId) => {
@@ -187,13 +192,36 @@ export class RecipePlanner extends BasePlanner {
 		const provisions = { ...childrenProvideItemsPerInterval };
 		Object.entries(requiredItemsPerInterval).forEach(([sitemId, items]) => provisions[Number(sitemId)] = (provisions[Number(sitemId)] ?? 0) - items);
 		Object.entries(provisions).filter(([, amount]) => amount >= 0).forEach(([citemId]) => delete provisions[Number(citemId)]);
-		Object.keys(provisions).forEach((citemId) => {
+	/*	Object.keys(provisions).forEach((citemId) => {
 			const itemId = Number(citemId);
 			if (!DSPData.producedVia[itemId]?.length) {
 				delete provisions[itemId];
 			}
-		});
+		});*/
 		return provisions;
+	});
+
+	deficitByItemId: Readable<Record<number, number>> = derived([this.children, this.deficit, this.recipeId, this.itemId, this.targetAmount], ([children, deficit, recipeId, itemId, targetAmount], set) => {
+		const allRequiredBuildings: Record<number, number>[] = new Array(children.length);
+
+
+		const unsubscribes = children.map((child, index) => {
+			return child.deficitByItemId.subscribe((rb) => {
+				// Recalculate the reduced value whenever any child store changes
+				allRequiredBuildings[index] = rb;
+				const reducedValue = allRequiredBuildings.filter(i => !!i).reduce((acc, childrenRequiredBuildings) => {
+					return tallyItems(acc, childrenRequiredBuildings);
+				}, recipeId ? deficit : { [itemId]: -targetAmount });
+				set(reducedValue);
+			});
+		});
+		const reducedValue = allRequiredBuildings.filter(i => !!i).reduce((acc, childrenRequiredBuildings) => {
+			return tallyItems(acc, childrenRequiredBuildings);
+		}, recipeId ? deficit : { [itemId]: -targetAmount });
+		set(reducedValue);
+
+		// Return a cleanup function to unsubscribe from all child stores
+		return () => unsubscribes.forEach(unsubscribe => unsubscribe());
 	});
 
 
