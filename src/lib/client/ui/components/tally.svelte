@@ -4,7 +4,7 @@
 	import type { Readable } from 'svelte/store';
 	import { FactoryGlobals } from '$lib/client/factory-globals';
 	import ItemIcon from './item-icon.svelte';
-
+import ConveyorCount from './conveyor-count.svelte'
 	let { planner } = $props<{ planner: RecipePlanner }>();
 	let { requiredBuildingsByRecipeId, itemId }: {
 		requiredBuildingsByRecipeId: Readable<Record<number, number>>,
@@ -85,21 +85,7 @@
 						</div>
 
 					{:else if activeTally === 'throughput'}
-						{@const roundedOutputs = String(Math.round(outputsPerSecond * 100) / 100) }
-
-						{@const decimalIndex = roundedOutputs.indexOf(".")}
-						{@const padPositions = decimalIndex === -1 ? 2 : roundedOutputs.length - 1 - decimalIndex}
-
-
-						{#each requiredConveyor(outputsPerSecond) as icons}
-							{#if icons[1] > 0}
-								<div class="flex gap-1 relative">
-									<span class="absolute w-full text-center top-0 backdrop-brightness-85">{icons[1]}</span>
-									<ItemIcon itemId={icons[0]} />
-								</div>
-							{/if}
-						{/each}
-
+						<ConveyorCount outputs={outputsPerSecond}></ConveyorCount>
 					{/if}
 
 				</div>
