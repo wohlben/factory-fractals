@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { FactoryGlobals } from '$lib/client/factory-globals';
 	import type { RecipePlanner } from '$lib/client/recipePlanner';
+	import ItemIcon from '$lib/client/ui/components/item-icon.svelte';
 
 	let { planner } = $props<{ planner: RecipePlanner }>();
 	let {recipe, tier, requiredBuildings} = planner
+	let { defaultTier } = FactoryGlobals;
+
 
 	let tierSelector = $state(false);
 	const switchTier = (availableTier: number) => {
@@ -25,7 +28,10 @@
 	<button
 		onclick={() => tierSelector = true}
 		class="text-center min-w-16 h-10 rounded-l-lg bg-slate-800 hover:bg-slate-600 py-2 px-3 flex justify-around items-end gap-2 relative ">
-			<span  class="text-xs text-gray-400 absolute top-0">tier {$tier}</span>
-			<b class="bottom-0.5 absolute">{Math.round($requiredBuildings * 100) / 100}</b>
+
+		<span class="top-0 absolute left-0 scale-75 opacity-50"><ItemIcon itemId={FactoryGlobals.factoryItems[$recipe?.Type][$tier]} /></span>
+
+		<span  class="text-xs text-gray-400 absolute top-0">tier {$tier}</span>
+		<b class="bottom-0.5 absolute">{Math.round($requiredBuildings * 100) / 100}</b>
 	</button>
 {/if}

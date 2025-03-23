@@ -75,7 +75,9 @@
 
 						<div class="text-right justify-self-end relative w-16" style="padding-right: {padPositions + (0.5)}em">
 							<div class="absolute right-0 top-0 z-0">
-								<ItemIcon itemId={FactoryGlobals.factoryItems[recipe?.Type][$defaultTier[recipe.Type]]} />
+								{#key $defaultTier}
+									<ItemIcon itemId={FactoryGlobals.factoryItems[recipe?.Type][$defaultTier[recipe.Type]]} />
+								{/key}
 							</div>
 
 							<span
