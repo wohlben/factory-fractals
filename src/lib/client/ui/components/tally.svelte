@@ -4,7 +4,8 @@
 	import type { Readable } from 'svelte/store';
 	import { FactoryGlobals } from '$lib/client/factory-globals';
 	import ItemIcon from './item-icon.svelte';
-import ConveyorCount from './conveyor-count.svelte'
+	import ConveyorCount from './conveyor-count.svelte';
+
 	let { planner } = $props<{ planner: RecipePlanner }>();
 	let { requiredBuildingsByRecipeId, itemId }: {
 		requiredBuildingsByRecipeId: Readable<Record<number, number>>,
@@ -76,7 +77,10 @@ import ConveyorCount from './conveyor-count.svelte'
 						<div class="text-right justify-self-end relative w-16" style="padding-right: {padPositions + (0.5)}em">
 							<div class="absolute right-0 top-0 z-0">
 								{#key $defaultTier}
-									<ItemIcon itemId={FactoryGlobals.factoryItems[recipe?.Type][$defaultTier[recipe.Type]]} />
+									<div class="opacity-70 scale-90">
+
+										<ItemIcon itemId={FactoryGlobals.factoryItems[recipe?.Type][$defaultTier[recipe.Type]]} />
+									</div>
 								{/key}
 							</div>
 
