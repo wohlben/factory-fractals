@@ -42,6 +42,7 @@ export interface RecipeeType {
 	'ItemCounts': number[],
 	'Results': number [],
 	'ResultCounts': number[],
+	IconPath: string
 }
 
 export interface ResourceType {

@@ -3,6 +3,7 @@
 	import { DSPData } from '$lib/client/dspdata';
 	import type { Readable } from 'svelte/store';
 	import { FactoryGlobals } from '$lib/client/factory-globals';
+	import ItemIcon from './item-icon.svelte';
 
 	let { planner } = $props<{ planner: RecipePlanner }>();
 	let { requiredBuildingsByRecipeId, itemId }: {
@@ -10,11 +11,46 @@
 		itemId: Readable<number>,
 		timeSpend: Readable<number>,
 	} = planner;
-	let {defaultTier} = FactoryGlobals;
+	let { defaultTier } = FactoryGlobals;
+
+	const requiredConveyor = (outputs: number) => {
+		switch (true) {
+			case outputs <= 6:
+				return [[2001, 1]];
+			case outputs <= 12:
+				return [[2002, 1]];
+			case outputs <= 30:
+				return [[2003, 1]];
+			default:
+				const stacked = Math.ceil(Math.ceil(outputs) / 30);
+				const conveyors = Math.ceil(stacked / 4);
+				return [[2014, stacked % 4], [2003, conveyors]];
+		}
+	};
+
+	let activeTally = $state<'throughput' | 'bulidings'>('bulidings');
 
 </script>
+
 <div class="md:max-w-sm w-full flex flex-col mx-auto lg:ml-0 gap-0.5">
-	<h4 class="px-4 py-2 bg-slate-800 rounded-t-lg">all required buildings</h4>
+	<h4 class="px-4 py-2 bg-slate-800 rounded-t-lg flex items-center">
+		<span class="flex-grow">required</span>
+		<button class=" px-4 py-2 rounded-l-lg  outline-gray-600"
+						class:bg-blue-700={activeTally === 'bulidings'}
+						class:bg-gray-700={activeTally !== 'bulidings'}
+						class:hover:bg-blue-500={activeTally === 'bulidings'}
+						class:hover:bg-gray-500={activeTally !== 'bulidings'}
+						onclick={() => activeTally = 'bulidings'}> buildings
+		</button>
+		<button class="hover:bg-slate-500 px-4 py-2  rounded-r-lg  outline-gray-600"
+						class:bg-blue-700={activeTally === 'throughput'}
+						class:bg-gray-700={activeTally !== 'throughput'}
+						class:hover:bg-blue-500={activeTally === 'throughput'}
+						class:hover:bg-gray-500={activeTally !== 'throughput'}
+
+						onclick={() => activeTally = 'throughput'}> conveyors
+		</button>
+	</h4>
 	{#key $itemId}
 		{#each Object.entries($requiredBuildingsByRecipeId) as allRequiredBuildings}
 			{@const [recipeId, requiredBuildings] = allRequiredBuildings}
@@ -23,13 +59,50 @@
 				{@const relativeSpeed = $defaultTier[recipe.Type] / recipe.TimeSpend}
 				{@const resultCounts = recipe.ResultCounts.reduce((acc, i) => i + acc, 0)}
 				{@const outputsPerSecond = requiredBuildings * relativeSpeed * resultCounts * 60}
-				<div class="flex odd:bg-gray-950 gap-2 px-2">
+
+				<div class="odd:bg-gray-950 gap-3 px-2 flex ">
+					<div class="justify-self-center w-14 text-center relative p-0.5">
+						<em class="absolute w-full h-full text-right left-0 top-0 backdrop-brightness-85 ">
+							{Math.round(outputsPerSecond * 100) / 100}/s
+						</em>
+						<ItemIcon itemId={recipe?.Results?.[0]} />
+					</div>
 					<span class="flex-grow">{recipe?.Name ?? "recipe" + recipeId }</span>
-					<span>{Math.round(requiredBuildings * 100) / 100}</span>
-					<em>{Math.round(outputsPerSecond * 100) / 100}/s</em>
+					{#if activeTally === 'bulidings'}
+						{@const roundedbuildings = String(Math.round(requiredBuildings * 10) / 10) }
+						{@const decimalIndex = roundedbuildings.indexOf(".")}
+						{@const padPositions = decimalIndex === -1 ? 1 : 0}
+
+						<div class="text-right justify-self-end relative w-16" style="padding-right: {padPositions + (0.5)}em">
+							<div class="absolute right-0 top-0 z-0">
+								<ItemIcon itemId={FactoryGlobals.factoryItems[recipe?.Type][$defaultTier[recipe.Type]]} />
+							</div>
+
+							<span
+								class="w-full h-full text-right top-0 backdrop-brightness-75 z-40">{roundedbuildings}</span>
+						</div>
+
+					{:else if activeTally === 'throughput'}
+						{@const roundedOutputs = String(Math.round(outputsPerSecond * 100) / 100) }
+
+						{@const decimalIndex = roundedOutputs.indexOf(".")}
+						{@const padPositions = decimalIndex === -1 ? 2 : roundedOutputs.length - 1 - decimalIndex}
+
+
+						{#each requiredConveyor(outputsPerSecond) as icons}
+							{#if icons[1] > 0}
+								<div class="flex gap-1 relative">
+									<span class="absolute w-full text-center top-0 backdrop-brightness-85">{icons[1]}</span>
+									<ItemIcon itemId={icons[0]} />
+								</div>
+							{/if}
+						{/each}
+
+					{/if}
+
 				</div>
 			{/if}
-
 		{/each}
 	{/key}
+
 </div>

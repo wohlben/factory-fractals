@@ -8,6 +8,7 @@
 	import { FactoryGlobals } from '$lib/client/factory-globals';
 	import { derived, get } from 'svelte/store';
 	import Tally from '$lib/client/ui/components/tally.svelte';
+	import item from '$lib/client/ui/components/item.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -15,11 +16,10 @@
 
 
 	let planner = $derived(new RecipePlanner(data.recipeId, undefined, undefined, undefined, undefined, data.depth, data.targetAmount));
-	let { targetInterval, recipe, timeSpend, timeSpendChanged, tier, children } = $derived(planner);
+	let { targetInterval, recipe, timeSpend, timeSpendChanged, tier, children, header } = $derived(planner);
 
 	const ONE_MINUTE = 60 * 60;
 	let dialogOpen = $state(false);
-
 
 
 	const applyToAll = (pnr?: RecipePlanner) => {
@@ -36,10 +36,21 @@
 	};
 
 </script>
+<svelte:head>
+	<link rel="icon" href={$header?.[0]} />
+	<title>{$header?.[1]}</title>
+
+</svelte:head>
+
 
 {#if (dialogOpen)}
+	<button onclick={() => dialogOpen = false}
+					class="fixed overscroll-contain w-screen h-screen backdrop-blur-2xl bg-black opacity-70 top-0 left-0 z-40"
+					aria-label="close">
+	</button>
 	<dialog open
-					class="max-w-2xl w-full h-full max-h-10/12 mx-auto top-1/12 bg-gray-950 z-50 md:px-5 text-amber-50 flex flex-col py-4 gap-2">
+					class="max-w-2xl w-full h-full max-h-10/12 mx-auto top-1/12 bg-gray-950 z-50 md:px-5 text-amber-50 flex flex-col py-4 gap-2 fixed outline-1 rounded-2xl outline-slate-600">
+		<h6 class="flex items-center justify-between"><span>Factory Globals</span><button onclick={() => dialogOpen = false} class="bg-slate-800 hover:bg-slate-700 w-12 py-2">✖️</button></h6>
 		<FactoryGlobalsC></FactoryGlobalsC>
 
 		<span class="flex-grow"></span>

@@ -1,6 +1,7 @@
 import { DSPData } from './dspdata';
 import { derived, get, type Readable, type Writable, writable } from 'svelte/store';
 import { FactoryGlobals } from '$lib/client/factory-globals';
+import { assets } from '$app/paths';
 
 
 class BasePlanner {
@@ -38,6 +39,15 @@ export class RecipePlanner extends BasePlanner {
 
 	item = derived(this.itemId, (itemId) => DSPData.item[itemId]);
 	recipe = derived(this.recipeId, recipeId => DSPData.recipe[recipeId]);
+	header = derived([this.itemId, this.recipe], ([itemId, recipe], ) => {
+		const _itemId = itemId ?? recipe?.Results?.[0]
+		if (!_itemId) return;
+		const item = DSPData.item[_itemId]
+		const path = item.IconPath.split('/');
+		const name = path[path.length - 1]
+		return name && [assets + `/dsp_sprites/${name}.png`, item.Name];
+	})
+
 
 	options = derived(this.itemId, (itemId) => DSPData.alternativeRecipe[itemId]);
 

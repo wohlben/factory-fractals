@@ -23,7 +23,7 @@ export const FactoryGlobals = {
 		Proliferator: 1
 	}),
 	availableTiers: {
-		Smelt: [1, 2],
+		Smelt: [1, 2, 3],
 		Assemble: [0.75, 1, 1.5, 3],
 		Research: [1],
 		Refine: [1],
@@ -38,9 +38,42 @@ export const FactoryGlobals = {
 		[0.25]: 60
 	} as const,
 	proliferatorRecipe: {
-		[0.125]: 1141,
-		[0.2]: 1142,
-		[0.25]: 1143
-	}
 
+	},
+	factoryItems: {
+		Smelt: {
+			[1]: 2302,
+			[2]: 2315,
+			[3]: 2319
+		},
+		Assemble: {
+			0.75: 2303,
+			1: 2304,
+			1.5: 2305,
+			3: 2318
+		},
+		Research: {
+			1: 2901,
+			2: 2902
+		},
+		Chemical: {
+			1: 2309,
+			2: 2317
+		},
+		Refine: {
+			1: 2308,
+		},
+		Particle: {
+			1: 1142,
+		},
+		Fractionate: {
+			1: 2310
+		},
+		Proliferator:  {
+			[0.125]: 1141,
+			[0.2]: 1142,
+			[0.25]: 1143
+		}
+	}
 };
+
