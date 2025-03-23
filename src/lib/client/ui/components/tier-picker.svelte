@@ -21,7 +21,7 @@
 		{#each FactoryGlobals.availableTiers[$recipe.Type] as availableTier}
 			<button class="px-2 py-1 outline-slate-600 hover:bg-slate-600 text-sm  rounded" class:outline-1={availableTier === $tier}
 							class:active={availableTier === $tier}
-							onclick={() => switchTier(availableTier)}>{availableTier}</button>
+							onclick={() => switchTier(availableTier)}>{availableTier} <ItemIcon itemId={FactoryGlobals.factoryItems[$recipe?.Type][availableTier]} /> </button>
 		{/each}
 	</div>
 	{:else}
