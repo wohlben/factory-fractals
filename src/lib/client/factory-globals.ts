@@ -64,10 +64,10 @@ export const FactoryGlobals = {
 			1: 2308,
 		},
 		Particle: {
-			1: 1142,
+			1: 2310,
 		},
 		Fractionate: {
-			1: 2310
+			1: 2314
 		},
 		Proliferator:  {
 			[0.125]: 1141,
