@@ -35,7 +35,7 @@
 	<div class="mb-4 my-4 mx-auto  grid grid-cols-2 gap-x-8 justify-center px-0.5">
 		{#each Object.entries($fabsByType) as allFabs, index}
 			{@const [fabType, requiredFabs] = allFabs}
-			<div class="flex gap-4 hover:bg-gray-700">
+			<div class="flex gap-4 dark:hover:bg-gray-700 hover:bg-gray-300">
 				<span>{fabType}</span>
 				<span class="text-right flex-grow">{Math.ceil(requiredFabs/devisor)}</span>
 			</div>
@@ -53,7 +53,7 @@
 	<div class="mx-auto  grid grid-cols-2 gap-x-8 justify-center px-0.5">
 		{#each Object.entries($deficitByItemId) as missingItems}
 			{@const [itemId] = missingItems}
-			<div class="flex gap-4 hover:bg-gray-700 px-1">
+			<div class="flex gap-4 dark:hover:bg-gray-700 hover:bg-gray-300 px-1">
 				<span>{DSPData.item[itemId].Name}</span>
 			</div>
 		{/each}

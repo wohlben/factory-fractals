@@ -34,18 +34,24 @@
 </script>
 
 <div class="md:max-w-sm w-full flex flex-col mx-auto lg:ml-0 gap-0.5">
-	<h4 class="px-4 py-2 bg-slate-800 rounded-t-lg flex items-center">
+	<h4 class="px-4 py-2 dark:bg-slate-800 bg-slate-200 rounded-t-lg flex items-center">
 		<span class="flex-grow">required</span>
-		<button class=" px-4 py-2 rounded-l-lg  outline-gray-600"
-						class:bg-blue-700={activeTally === 'bulidings'}
-						class:bg-gray-700={activeTally !== 'bulidings'}
+		<button class=" px-4 py-2 rounded-l-lg  outline-gray-600 "
+						class:bg-blue-300={activeTally === 'bulidings'}
+						class:bg-gray-300={activeTally !== 'bulidings'}
 						class:hover:bg-blue-500={activeTally === 'bulidings'}
 						class:hover:bg-gray-500={activeTally !== 'bulidings'}
+						class:dark:bg-blue-700={activeTally === 'bulidings'}
+						class:dark:bg-gray-700={activeTally !== 'bulidings'}
+
 						onclick={() => activeTally = 'bulidings'}> buildings
 		</button>
 		<button class="hover:bg-slate-500 px-4 py-2  rounded-r-lg  outline-gray-600"
-						class:bg-blue-700={activeTally === 'throughput'}
-						class:bg-gray-700={activeTally !== 'throughput'}
+						class:bg-blue-300={activeTally === 'throughput'}
+						class:bg-gray-300={activeTally !== 'throughput'}
+
+						class:dark:bg-blue-700={activeTally === 'throughput'}
+						class:dark:bg-gray-700={activeTally !== 'throughput'}
 						class:hover:bg-blue-500={activeTally === 'throughput'}
 						class:hover:bg-gray-500={activeTally !== 'throughput'}
 
@@ -61,9 +67,9 @@
 				{@const resultCounts = recipe.ResultCounts.reduce((acc, i) => i + acc, 0)}
 				{@const outputsPerSecond = requiredBuildings * relativeSpeed * resultCounts * 60}
 
-				<div class="odd:bg-gray-950 gap-3 px-2 flex ">
+				<div class="dark:odd:bg-gray-950 odd:bg-gray-200   gap-3 px-2 flex ">
 					<div class="justify-self-center w-14 text-center relative p-0.5">
-						<em class="absolute w-full h-full text-right left-0 top-0 backdrop-brightness-85 ">
+						<em class="absolute w-full h-full text-right left-0 top-0 dark:backdrop-brightness-85 bg-white/50 dark:bg-black/30   ">
 							{Math.round(outputsPerSecond * 100) / 100}/s
 						</em>
 						<ItemIcon itemId={recipe?.Results?.[0]} />
@@ -85,7 +91,7 @@
 							</div>
 
 							<span
-								class="w-full h-full text-right top-0 backdrop-brightness-75 z-40">{roundedbuildings}</span>
+								class="w-full h-full text-right top-0 dark:backdrop-brightness-75 z-40">{roundedbuildings}</span>
 						</div>
 
 					{:else if activeTally === 'throughput'}

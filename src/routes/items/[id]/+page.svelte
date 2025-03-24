@@ -52,7 +52,7 @@
 {#if (DSPData.relatedRecipes[itemId]?.size > 0)}
 	<div class="py-2 px-4 max-w-xl">
 		<h6 class="py-2 px-4 bg-slate-700 rounded-t-lg">Related Recipes</h6>
-		<div class="py-2 px-4 bg-slate-800 flex flex-col gap-1">
+		<div class="py-2 px-4 dark:bg-slate-800 bg-slate-200 flex flex-col gap-1">
 			{#each DSPData.relatedRecipes[itemId] as recipeId}
 				<a href={LINKS.recipe(recipeId)}>{DSPData.recipe[recipeId].Name}</a>
 			{/each}

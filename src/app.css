@@ -29,6 +29,7 @@ select {
 .multi:not(.active) {
     @apply dark:text-slate-300
 }
+
 @layer base {
     button,
     [role='button'] {

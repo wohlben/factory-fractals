@@ -19,15 +19,16 @@
 		}
 	};
 
-	let conveyorIcons = $derived(requiredConveyor(outputs))
+	let conveyorIcons = $derived(requiredConveyor(outputs));
 
 </script>
 
 {#each conveyorIcons as icons}
 	{#if icons[1] > 0}
-		<div class="flex gap-1 relative">
-			<span class="absolute w-full text-center top-0 backdrop-brightness-85">{icons[1]}</span>
-			<ItemIcon itemId={icons[0]} />
+		<div class="flex gap-1 relative justify-center">
+				<ItemIcon itemId={icons[0]} />
+			<span class="absolute  mx-auto text-center top-0 px-1    rounded-3xl bg-white/70 dark:bg-black/30  ">{icons[1]}</span>
+
 		</div>
 	{/if}
 {/each}

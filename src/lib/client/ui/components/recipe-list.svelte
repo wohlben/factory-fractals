@@ -71,6 +71,6 @@
 
 {#each availableRecipes as recipe}
 	<div class="flex flex-col items-stretch group w-full ">
-		<a class="my-2 z-30 hover:bg-slate-700 w-xs" href={LINKS.recipe(recipe.ID)}>{ recipe.Name }</a>
+		<a class="my-2 z-30 dark:hover:bg-slate-700 hover:bg-slate-300 w-xs" href={LINKS.recipe(recipe.ID)}>{ recipe.Name }</a>
 	</div>
 {/each}
