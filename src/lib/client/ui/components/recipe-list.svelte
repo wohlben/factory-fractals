@@ -7,6 +7,8 @@
 	import RecipeIcon from './recipe-icon.svelte';
 
 
+	let { children, recipeName: passedInRecipeName } = $props<{ recipeName?: string }>();
+
 	let item = DSPData.item;
 
 	let selectedTypes = $state([] as string[]);
@@ -14,13 +16,14 @@
 	let buildableRecipes = optionalCheckboxSvelte();
 	let fluidRecipes = optionalCheckboxSvelte();
 	let entityRecipes = optionalCheckboxSvelte();
+	let recipeNameState = $state('');
 
-	let recipeName = $state('');
+	let recipeName = $derived(passedInRecipeName ?? recipeNameState);
 
 	let moreFilter = $state(false);
 
 
-	let matchingItems = $derived(!recipeName ? [] : DSPData.items.filter(i => i.Name.toLowerCase().includes(recipeName.toLowerCase())).map(i => i.ID));
+	let matchingItems = $derived(!recipeName ? [] : DSPData.items.filter(i => i.Name.toLowerCase().includes(recipeName?.toLowerCase())).map(i => i.ID));
 	let relatedRecipes = $derived((() => {
 		const demRecipees = new Set();
 		matchingItems.forEach(i => {
@@ -42,9 +45,10 @@
 	let recipeTypes = new Set(DSPData.recipees.map(i => i.Type));
 </script>
 
-<div class="flex gap-0.5 flex-col mb-4 sticky top-0 mr-2 backdrop-blur-3xl backdrop-opacity-75  z-40">
+<div
+	class="flex gap-0.5 flex-col mb-4 sticky top-0 mr-2 backdrop-blur bg-gray-50/70  dark:bg-gray-950/70 lg:dark:bg-transparent lg:bg-transparent ">
 	{#if (moreFilter)}
-		<div class="flex w-full gap-2 ">
+		<div class="flex w-full gap-2">
 			<label for="recipeType">type</label><select id="recipeType" bind:value={selectedTypes} multiple>
 			{#each recipeTypes as rt }
 				<option>{rt}</option>
@@ -67,12 +71,21 @@
 			</div>
 		</div>
 	{/if}
-	<label for="recipeName">ingredient or recipe name</label><input id=recipeName bind:value={recipeName} />
+	{#if children}
+		{children()}
+	{:else}
+		{#if (passedInRecipeName !== undefined)}
+		{:else}
+			<label for="recipeName" class="py-2 text-center">ingredient or recipe name</label>
+			<input id=recipeName
+						bind:value={recipeNameState} />
+		{/if}
+	{/if}
 </div>
 
 {#each availableRecipes as recipe}
 	<div class="flex flex-col items-stretch group w-full ">
-		<a class="my-2 z-30 dark:hover:bg-slate-700 hover:bg-slate-300 w-xs flex gap-2" href={LINKS.recipe(recipe.ID)}>
+		<a class="  dark:hover:bg-slate-700 hover:bg-slate-300  md:px-4 md:py-2 w-full flex gap-2" href={LINKS.recipe(recipe.ID)}>
 			<span class="w-8"><RecipeIcon recipeId={recipe.ID} /></span><span class="flex-grow">{ recipe.Name }</span></a>
 	</div>
 {/each}

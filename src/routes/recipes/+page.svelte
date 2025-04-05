@@ -72,7 +72,7 @@
 	<div class="w-1/2 flex flex-col items-stretch group">
 		<div class="my-2 z-30"><a class="w-xs" href={LINKS.recipe(recipe.ID)}>{ recipe.Name }</a></div>
 
-		<div class="group-hover:block hidden h-0 overflow-visible z-40">
+		<div class="group-hover:block hidden h-0 overflow-visible z-20">
 			<RecipeSummary recipeId={recipe.ID}>
 			</RecipeSummary>
 		</div>

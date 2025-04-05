@@ -5,7 +5,7 @@
 	import TierPicker from './tier-picker.svelte';
 	import PlannerDetail from './planner-details.svelte';
 	import ItemIcon from './item-icon.svelte';
-	import Sprite from './sprite.svelte';
+	import Dialog from './dialog.svelte';
 	import { DSPData } from '$lib/client/dspdata';
 	import { LINKS } from '$lib';
 	import PlannerItemPill from './planner-item-pill.svelte';
@@ -39,22 +39,31 @@
 			planner.setRecipeId(selectedRecipe);
 		}
 	});
+
+
+	let devisorInput = $state(1);
+	let devisor = $derived(!devisorInput || isNaN(devisorInput)  ?  1 : devisorInput);
+	let devidedRequiredBuildings = $derived(Math.ceil($requiredBuildings / devisor))
+
 </script>
 
 {#if (detailDialog)}
-	<dialog open
-					class="max-w-2xl w-full h-full max-h-10/12 mx-auto top-1/12 bg-gray-950 z-50 md:px-5 text-amber-50 flex flex-col py-4 gap-2 fixed ">
+	{#snippet header()}
+		<h3 class="dark:bg-blue-800 bg-blue-300 py-2 px-4  text-center w-full">
+			<input bind:value={devisorInput} class="w-24" type="number">
+			<span
+				class="text-xs dark:text-slate-400 text-slate-700">x</span>
 
-		<PlannerDetail planner={planner}></PlannerDetail>
-		<button class="dark:bg-green-800 bg-green-200 dark:hover:bg-green-700 hover:bg-green-300 py-2 rounded-xl mt-auto" onclick={() => detailDialog = false}>close
+			<span class="w-14 text-right">{devidedRequiredBuildings}</span>
+			<span>{$recipe.Name}s</span>
+		</h3>
+	{/snippet}
+	<Dialog close={() => detailDialog = false} header={header}>
+		<PlannerDetail planner={planner} devisor={devisor}></PlannerDetail>
+		<button class="dark:bg-green-800 bg-green-200 dark:hover:bg-green-700 hover:bg-green-300 py-2 rounded-xl mt-auto"
+						onclick={() => detailDialog = false}>close
 		</button>
-	</dialog>
-
-	<button onclick={() => detailDialog = false}
-					class="fixed overscroll-contain w-screen h-screen backdrop-blur-2xl dark:bg-black  opacity-70 top-0 left-0 z-40"
-					aria-label="close">
-	</button>
-
+	</Dialog>
 {/if}
 
 <div class="flex gap-1 max-w-2xl items-center dark:hover:bg-gray-700 hover:bg-gray-300  flex-wrap @container">
@@ -98,7 +107,8 @@
 					{/if}
 			</span>
 				{#if $children.length > 1 && !planner.amountEditable}
-					<button class="py-1 rounded-xl px-4 dark:bg-slate-800 bg-slate-200 dark:hover:bg-slate-700 hover:bg-slate-300" onclick={() => detailDialog = true}>🔎
+					<button class="py-1 rounded-xl px-4 dark:bg-slate-800 bg-slate-200 dark:hover:bg-slate-700 hover:bg-slate-300"
+									onclick={() => detailDialog = true}>🔎
 					</button>
 				{/if}
 			{/if}

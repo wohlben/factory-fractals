@@ -99,7 +99,7 @@
 								</div>
 
 								<span
-									class="w-full h-full text-right top-0 dark:backdrop-brightness-75 z-40">{roundedbuildings}</span>
+									class="w-full h-full text-right top-0 dark:backdrop-brightness-75 ">{roundedbuildings}</span>
 							</div>
 
 						{:else if activeTally === 'throughput'}

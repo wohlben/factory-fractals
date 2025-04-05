@@ -6,23 +6,19 @@ const preValue = () => {
 	const storedItem = browser && localStorage?.getItem(`defaultTiers`);
 	if (storedItem) {
 		const storedValue: Record<RecipeType, number> = JSON.parse(storedItem);
+		Object.keys(storedValue).forEach((key) => {
+			if (!availableTiers[key].find(i => i === storedValue[key])) {
+				storedValue[key] = defaultValues[key as keyof typeof defaultValues];
+				console.log(key, storedValue[key]);
+
+			}
+		});
 		return writable(storedValue);
 	}
 	return undefined;
 };
 
-export const FactoryGlobals = {
-	defaultTier: preValue() ?? writable<Record<RecipeType, number>>({
-		Smelt: 1,
-		Assemble: 0.75,
-		Research: 1,
-		Chemical: 1,
-		Refine: 1,
-		Particle: 1,
-		Fractionate: 1,
-		Proliferator: 1
-	}),
-	availableTiers: {
+const availableTiers = {
 		Smelt: [1, 2, 3],
 		Assemble: [0.75, 1, 1.5, 3],
 		Research: [1],
@@ -30,16 +26,30 @@ export const FactoryGlobals = {
 		Chemical: [1, 2],
 		Particle: [1],
 		Fractionate: [1],
-		Proliferator: [0.125, 0.2, 0.25]
-	} as Record<RecipeType, number[]>,
+		Proliferator: [0, 0.125, 0.2, 0.25]
+	} as Record<RecipeType, number[]>
+
+
+const defaultValues = {
+	Smelt: 1,
+	Assemble: 0.75,
+	Research: 1,
+	Chemical: 1,
+	Refine: 1,
+	Particle: 1,
+	Fractionate: 1,
+	Proliferator: 0
+};
+
+export const FactoryGlobals = {
+	defaultTier: preValue() ?? writable<Record<RecipeType, number>>(defaultValues),
+	availableTiers,
 	proliferatorUsage: {
 		[0.125]: 12,
 		[0.2]: 24,
 		[0.25]: 60
 	} as const,
-	proliferatorRecipe: {
-
-	},
+	proliferatorRecipe: {},
 	factoryItems: {
 		Smelt: {
 			[1]: 2302,
@@ -61,15 +71,16 @@ export const FactoryGlobals = {
 			2: 2317
 		},
 		Refine: {
-			1: 2308,
+			1: 2308
 		},
 		Particle: {
-			1: 2310,
+			1: 2310
 		},
 		Fractionate: {
 			1: 2314
 		},
-		Proliferator:  {
+		Proliferator: {
+			[0]: null,
 			[0.125]: 1141,
 			[0.2]: 1142,
 			[0.25]: 1143

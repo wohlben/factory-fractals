@@ -33,7 +33,7 @@
 						{#if (itemId === upgrade)} 👈{/if}
 
 					</div>
-					<div class="group-hover:block hidden h-0 overflow-visible z-40">
+					<div class="group-hover:block hidden h-0 overflow-visible ">
 						<RecipeSummary recipeId={DSPData.producedVia[upgrade][0].ID} />
 					</div>
 				</div>
