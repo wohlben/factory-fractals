@@ -4,6 +4,7 @@
 	import { derived } from 'svelte/store';
 	import { optionalCheckboxSvelte } from '$lib/client/optional-checkbox.svelte';
 	import { LINKS } from '$lib';
+	import RecipeIcon from './recipe-icon.svelte';
 
 
 	let item = DSPData.item;
@@ -71,6 +72,7 @@
 
 {#each availableRecipes as recipe}
 	<div class="flex flex-col items-stretch group w-full ">
-		<a class="my-2 z-30 dark:hover:bg-slate-700 hover:bg-slate-300 w-xs" href={LINKS.recipe(recipe.ID)}>{ recipe.Name }</a>
+		<a class="my-2 z-30 dark:hover:bg-slate-700 hover:bg-slate-300 w-xs flex gap-2" href={LINKS.recipe(recipe.ID)}>
+			<span class="w-8"><RecipeIcon recipeId={recipe.ID} /></span><span class="flex-grow">{ recipe.Name }</span></a>
 	</div>
 {/each}

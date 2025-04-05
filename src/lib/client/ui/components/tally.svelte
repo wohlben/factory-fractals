@@ -64,41 +64,57 @@
 			{#if (recipeId)}
 				{@const recipe = DSPData.recipe[Number(recipeId)]}
 				{@const relativeSpeed = $defaultTier[recipe.Type] / recipe.TimeSpend}
-				{@const resultCounts = recipe.ResultCounts.reduce((acc, i) => i + acc, 0)}
-				{@const outputsPerSecond = requiredBuildings * relativeSpeed * resultCounts * 60}
+				<div class="dark:odd:bg-gray-950 odd:bg-gray-200 py-1">
 
-				<div class="dark:odd:bg-gray-950 odd:bg-gray-200   gap-3 px-2 flex ">
-					<div class="justify-self-center w-14 text-center relative p-0.5">
-						<em class="absolute w-full h-full text-right left-0 top-0 dark:backdrop-brightness-85 bg-white/50 dark:bg-black/30   ">
-							{Math.round(outputsPerSecond * 100) / 100}/s
-						</em>
-						<ItemIcon itemId={recipe?.Results?.[0]} />
-					</div>
-					<span class="flex-grow">{recipe?.Name ?? "recipe" + recipeId }</span>
-					{#if activeTally === 'bulidings'}
-						{@const roundedbuildings = String(Math.round(requiredBuildings * 10) / 10) }
-						{@const decimalIndex = roundedbuildings.indexOf(".")}
-						{@const padPositions = decimalIndex === -1 ? 1 : 0}
+					<div class="gap-3 px-2 flex items-center justify-between">
+						<div class="justify-self-center w-14 text-center p-0.5 flex flex-col">
+							{#each recipe.Results as resultItemId, index }
+								{@const outputsPerSecond = requiredBuildings * relativeSpeed * recipe.ResultCounts[index] * 60}
+								<div class="relative">
 
-						<div class="text-right justify-self-end relative w-16" style="padding-right: {padPositions + (0.5)}em">
-							<div class="absolute right-0 top-0 z-0">
-								{#key $defaultTier}
-									<div class="opacity-70 scale-90">
+									<em
+										class="absolute w-full h-full text-right left-0 top-0 dark:backdrop-brightness-85 bg-white/50 dark:bg-black/30 ">
+										{Math.round(outputsPerSecond * 100) / 100}/s
+									</em>
+									<ItemIcon itemId={resultItemId} />
 
-										<ItemIcon itemId={FactoryGlobals.factoryItems[recipe?.Type][$defaultTier[recipe.Type]]} />
-									</div>
-								{/key}
+								</div>
+							{/each}
+
+						</div>
+						<span class="flex-grow">{recipe?.Name ?? "recipe" + recipeId}</span>
+						{#if activeTally === 'bulidings'}
+							{@const roundedbuildings = String(Math.round(requiredBuildings * 10) / 10) }
+							{@const decimalIndex = roundedbuildings.indexOf(".")}
+							{@const padPositions = decimalIndex === -1 ? 1 : 0}
+
+							<div class="text-right justify-self-end relative w-16" style="padding-right: {padPositions + (0.5)}em">
+								<div class="absolute right-0 top-0 z-0">
+									{#key $defaultTier}
+										<div class="opacity-70 scale-90">
+											<ItemIcon
+												itemId={FactoryGlobals.factoryItems[recipe?.Type as keyof typeof FactoryGlobals.factoryItems][$defaultTier[recipe.Type] as keyof typeof FactoryGlobals.factoryItems[keyof typeof FactoryGlobals.factoryItems]]} />
+										</div>
+									{/key}
+								</div>
+
+								<span
+									class="w-full h-full text-right top-0 dark:backdrop-brightness-75 z-40">{roundedbuildings}</span>
 							</div>
 
-							<span
-								class="w-full h-full text-right top-0 dark:backdrop-brightness-75 z-40">{roundedbuildings}</span>
-						</div>
+						{:else if activeTally === 'throughput'}
+							{#each recipe.Results as resultItemId, index }
+								{@const outputsPerSecond = requiredBuildings * relativeSpeed * recipe.ResultCounts[index] * 60}
+								<div class="flex flex-col">
+									<ConveyorCount outputs={outputsPerSecond}></ConveyorCount>
 
-					{:else if activeTally === 'throughput'}
-						<ConveyorCount outputs={outputsPerSecond}></ConveyorCount>
-					{/if}
+								</div>
 
+							{/each}
+						{/if}
+					</div>
 				</div>
+
 			{/if}
 		{/each}
 	{/key}
