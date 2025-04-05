@@ -36,7 +36,7 @@
 		dialogOpen = false;
 	};
 
-	let recipeName = $state('')
+	let recipeName = $state('');
 
 </script>
 <svelte:head>
@@ -70,12 +70,12 @@
 
 <div class="flex gap-12 flex-wrap lg:flex-nowrap">
 
-	<div class="lg:max-w-sm lg:block hidden max-h-screen  ml-auto overflow-y-auto">
+	<div class="lg:max-w-xs lg:block hidden max-h-screen  ml-auto overflow-y-auto ">
 		<RecipeList></RecipeList>
 	</div>
 
-	<div class="max-w-2xl w-full lg:mx-0 mx-auto">
-		<div class="flex  text-sm py-1 gap-2">
+	<div class="max-w-2xl w-full lg:mx-0 mx-auto overflow-y-scroll max-h-screen ">
+		<div class="flex  text-sm py-1 gap-2 sticky top-0 z-10 bg-slate-50/70 dark:bg-slate-950/70">
 		<span class="px-3 py-1 dark:bg-slate-800 bg-slate-200 rounded-r-lg">Items per
 			<span class="inline-flex">
 						<button class="px-1.5 py-2 multi hover:bg-slate-700" class:animate-flash={$timeSpendChanged}
@@ -122,7 +122,7 @@
 		</div>
 	{/snippet}
 	<Dialog close={() => searchAbsolute = false} header={dialogHeader}>
-			<RecipeList recipeName={recipeName}></RecipeList>
+		<RecipeList recipeName={recipeName}></RecipeList>
 
 	</Dialog>
 
