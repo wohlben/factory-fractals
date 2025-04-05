@@ -33,7 +33,7 @@
 
 </script>
 
-<div class="md:max-w-sm w-full flex flex-col mx-auto lg:ml-0 gap-0.5 overflow-y-scroll max-h-screen">
+<div class="md:max-w-sm w-full flex flex-col mx-auto lg:ml-0 gap-0.5 overflow-y-auto max-h-screen scrollbar-thin">
 	<h4 class="px-4 py-2 dark:bg-slate-800 bg-slate-200 rounded-t-lg flex items-center sticky top-0 z-10">
 		<span class="flex-grow">required</span>
 		<button class=" px-4 py-2 rounded-l-lg  outline-gray-600 "

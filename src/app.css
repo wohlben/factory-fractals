@@ -40,3 +40,5 @@ select {
         cursor: default;
     }
 }
+
+@plugin 'tailwind-scrollbar';
