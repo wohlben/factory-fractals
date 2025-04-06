@@ -6,5 +6,5 @@ export const load: PageLoad = ({ params, url }) => {
 	const recipeId = Number(id);
 	const depth = url.searchParams.get('depth');
 	const targetAmount = url.searchParams.get('targetAmount');
-	return {recipeId, depth: (depth && parseInt(depth)) || 1, targetAmount: targetAmount && parseInt(targetAmount) || 1};
+	return {recipeId, depth: (depth && parseInt(depth)) || null, targetAmount: targetAmount && parseInt(targetAmount) || 1};
 };

@@ -14,11 +14,10 @@
 
 	let { data }: PageProps = $props();
 
-	let { defaultTier } = FactoryGlobals;
+	let { defaultTier, defaultDepth } = FactoryGlobals;
 
-
-	let planner = $derived(new RecipePlanner(data.recipeId, undefined, undefined, undefined, undefined, data.depth, data.targetAmount));
-	let { targetInterval, recipe, timeSpend, timeSpendChanged, tier, children, header } = $derived(planner);
+	let planner = $derived(new RecipePlanner(data.recipeId, undefined, undefined, undefined, undefined, data.depth ?? $defaultDepth, data.targetAmount));
+	let { header } = $derived(planner);
 
 	let dialogOpen = $state(false);
 	let searchAbsolute = $state(false);

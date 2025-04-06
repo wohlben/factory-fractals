@@ -29,6 +29,16 @@ const storedDefaultInterval = () => {
 	return writable(null);
 };
 
+const storedDefaultTargetDepth = () => {
+	const storedItem = browser && localStorage?.getItem(`defaultDepth`);
+	if (storedItem) {
+		const storedValue = JSON.parse(storedItem);
+		const depth = storedValue?.depth;
+		return writable(depth ?? 1);
+	}
+	return writable(1);
+};
+
 const storedDefaultRecipe = () => {
 	const storedItem = browser && localStorage?.getItem(`defaultRecipes`);
 	const itemToDefaultRecipe: Record<number, number | null> = {};
@@ -87,6 +97,7 @@ export const FactoryGlobals = {
 	proliferatorRecipe: {},
 	availableIntervals,
 	defaultInterval: storedDefaultInterval(),
+	defaultDepth: storedDefaultTargetDepth(),
 	defaultRecipes: storedDefaultRecipe(),
 	factoryItems: {
 		Smelt: {
