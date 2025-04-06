@@ -10,6 +10,7 @@
 	import Tally from '$lib/client/ui/components/tally.svelte';
 	import Dialog from '$lib/client/ui/components/dialog.svelte';
 	import IntervalPicker from '$lib/client/ui/components/interval-picker.svelte';
+	import ButtonGroup from '$lib/client/ui/components/button-group.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -38,6 +39,13 @@
 	};
 
 	let recipeName = $state('');
+
+
+	let tallyOptions = [
+		{label: 'buildings', select: () => activeTally = 'buildings'},
+		{label: 'throughput', select: () => activeTally = 'throughput'},
+	]
+	let activeTally = $state<typeof tallyOptions['label']>('buildings');
 
 </script>
 <svelte:head>
@@ -97,7 +105,7 @@
 		{/key}
 
 	</div>
-	<div class="md:hidden">
+	<div class="hidden lg:block max-w-sm w-full">
 		{#key planner}
 			<Tally planner={planner} />
 		{/key}
@@ -107,27 +115,29 @@
 </div>
 
 {#if (searchAbsolute)}
-	{#snippet dialogHeader()}
-		<div class="flex w-full px-12 py-0.5 dark:bg-blue-700/70 bg-blue-300/70 ">
-			<label for="recipeName" class="py-2 text-center w-1/3 ">ingredient or recipe name</label>
-			<input id=recipeName class="flex-grow"
-						 bind:value={recipeName} />
-		</div>
-	{/snippet}
-	<Dialog close={() => searchAbsolute = false} header={dialogHeader}>
-		<RecipeList recipeName={recipeName}></RecipeList>
 
+	<Dialog close={() => searchAbsolute = false}>
+		<RecipeList recipeName={recipeName}></RecipeList>
+		{#snippet header()}
+			<div class="flex w-full px-12 py-0.5 dark:bg-blue-700/70 bg-blue-300/70 ">
+				<label for="recipeName" class="py-2 text-center w-1/3 ">ingredient or recipe name</label>
+				<input id=recipeName class="flex-grow"
+							 bind:value={recipeName} />
+			</div>
+		{/snippet}
 	</Dialog>
 {/if}
 
 {#if (tallyDialog)}
-	{#snippet dialogHeader()}
-		<span class="dark:bg-slate-700/70 bg-slate-300/70 w-full py-2 px-12">		Factory Globals</span>
-	{/snippet}
-	<Dialog close={() => tallyDialog = false} header={dialogHeader}>
+	<Dialog close={() => tallyDialog = false}>
+		{#snippet header()}
+			<ButtonGroup options={tallyOptions} selectedOption={activeTally} label="required"  />
+		{/snippet}
+
+
 		{#key planner}
 
-		<Tally planner={planner} />
+		<Tally planner={planner}  activeTally={activeTally}/>
 		{/key}
 
 	</Dialog>

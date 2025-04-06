@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { RecipePlanner } from '$lib/client/recipePlanner';
 	import { DSPData } from '$lib/client/dspdata';
-	import type { Readable } from 'svelte/store';
+	import { type Readable, writable } from 'svelte/store';
 	import { FactoryGlobals } from '$lib/client/factory-globals';
 	import ItemIcon from './item-icon.svelte';
 	import ConveyorCount from './conveyor-count.svelte';
+	import ButtonGroup from './button-group.svelte'
 
-	let { planner } = $props<{ planner: RecipePlanner }>();
+	let { planner, activeTally: passedInActiveTally } = $props<{ planner: RecipePlanner, activeTally: string }>();
 	let { requiredBuildingsByRecipeId, itemId }: {
 		requiredBuildingsByRecipeId: Readable<Record<number, number>>,
 		itemId: Readable<number>,
@@ -29,35 +30,19 @@
 		}
 	};
 
-	let activeTally = $state<'throughput' | 'bulidings'>('bulidings');
 
+	let tallyOptions = [
+		{label: 'buildings', select: () => activeTallyInput = 'buildings'},
+		{label: 'throughput', select: () => activeTallyInput = 'throughput'},
+	]
+	let activeTallyInput = $state<typeof tallyOptions['label']>('buildings');
+	let activeTally = $derived(passedInActiveTally ?? activeTallyInput)
 </script>
 
 <div class="md:max-w-sm w-full flex flex-col mx-auto lg:ml-0 gap-0.5 overflow-y-auto max-h-screen scrollbar-thin">
-	<h4 class="px-4 py-2 dark:bg-slate-800 bg-slate-200 rounded-t-lg flex items-center sticky top-0 z-10">
-		<span class="flex-grow">required</span>
-		<button class=" px-4 py-2 rounded-l-lg  outline-gray-600 "
-						class:bg-blue-300={activeTally === 'bulidings'}
-						class:bg-gray-300={activeTally !== 'bulidings'}
-						class:hover:bg-blue-500={activeTally === 'bulidings'}
-						class:hover:bg-gray-500={activeTally !== 'bulidings'}
-						class:dark:bg-blue-700={activeTally === 'bulidings'}
-						class:dark:bg-gray-700={activeTally !== 'bulidings'}
-
-						onclick={() => activeTally = 'bulidings'}> buildings
-		</button>
-		<button class="hover:bg-slate-500 px-4 py-2  rounded-r-lg  outline-gray-600"
-						class:bg-blue-300={activeTally === 'throughput'}
-						class:bg-gray-300={activeTally !== 'throughput'}
-
-						class:dark:bg-blue-700={activeTally === 'throughput'}
-						class:dark:bg-gray-700={activeTally !== 'throughput'}
-						class:hover:bg-blue-500={activeTally === 'throughput'}
-						class:hover:bg-gray-500={activeTally !== 'throughput'}
-
-						onclick={() => activeTally = 'throughput'}> conveyors
-		</button>
-	</h4>
+	{#if (!passedInActiveTally)}
+		<ButtonGroup options={tallyOptions} selectedOption={activeTally} label="required"  />
+		{/if}
 	{#key $itemId}
 		{#each Object.entries($requiredBuildingsByRecipeId) as allRequiredBuildings}
 			{@const [recipeId, requiredBuildings] = allRequiredBuildings}
@@ -83,7 +68,7 @@
 
 						</div>
 						<span class="flex-grow">{recipe?.Name ?? "recipe" + recipeId}</span>
-						{#if activeTally === 'bulidings'}
+						{#if activeTally === 'buildings'}
 							{@const roundedbuildings = String(Math.round(requiredBuildings * 10) / 10) }
 							{@const decimalIndex = roundedbuildings.indexOf(".")}
 							{@const padPositions = decimalIndex === -1 ? 1 : 0}
