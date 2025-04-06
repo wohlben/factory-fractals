@@ -7,7 +7,7 @@
 	let defaultTierReadable = FactoryGlobals.defaultTier;
 	let defaultRecipes = FactoryGlobals.defaultRecipes;
 
-	let defaultTiersOpen = $state(false);
+	let defaultTiersOpen = $state(true);
 
 	let defaultRecipeOpen = $state(true);
 
