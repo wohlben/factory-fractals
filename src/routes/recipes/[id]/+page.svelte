@@ -76,9 +76,9 @@
 	</Dialog>
 {/if}
 
-<div class="flex gap-12 flex-wrap lg:flex-nowrap">
+<div class="flex gap-12 flex-wrap lg:flex-nowrap justify-center">
 
-	<div class="lg:max-w-xs lg:block hidden max-h-screen  ml-auto overflow-y-auto scrollbar-thin ">
+	<div class="lg:max-w-xs xl:block hidden max-h-screen  ml-auto overflow-y-auto scrollbar-thin ">
 		<RecipeList></RecipeList>
 	</div>
 
@@ -91,7 +91,7 @@
 							class:dark:bg-slate-600={searchAbsolute} class:dark:bg-slate-800={!searchAbsolute}
 							onclick={() => tallyDialog = !tallyDialog}>{!tallyDialog ? '📃' : '✖️' }
 			</button>
-			<button class="px-3 py-3  bg-slate-200 dark:hover:bg-slate-700 hover:bg-slate-300 rounded-lg lg:hidden"
+			<button class="px-3 py-3  bg-slate-200 dark:hover:bg-slate-700 hover:bg-slate-300 rounded-lg xl:hidden"
 							class:dark:bg-slate-600={searchAbsolute} class:dark:bg-slate-800={!searchAbsolute}
 							onclick={() => searchAbsolute = !searchAbsolute}>{!searchAbsolute ? '🔍' : '✖️' }
 			</button>

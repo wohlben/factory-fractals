@@ -39,7 +39,7 @@
 	let activeTally = $derived(passedInActiveTally ?? activeTallyInput)
 </script>
 
-<div class="md:max-w-sm w-full flex flex-col mx-auto lg:ml-0 gap-0.5 overflow-y-auto max-h-screen scrollbar-thin">
+<div class="md:max-w-sm w-full flex flex-col mx-auto lg:ml-0  gap-0.5 overflow-y-auto max-h-screen scrollbar-thin">
 	{#if (!passedInActiveTally)}
 		<ButtonGroup options={tallyOptions} selectedOption={activeTally} label="required"  />
 		{/if}
