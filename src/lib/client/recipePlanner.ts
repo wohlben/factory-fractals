@@ -251,6 +251,11 @@ export class RecipePlanner extends BasePlanner {
 	constructor(_recipeId: number | undefined, _itemId?: number, parentRequiredItemsPerInterval?: Readable<Record<number, number>>, targetInterval?: Readable<number|null>, public depth = 0, targetDepth = 1, initTargetAmount?: number) {
 		const extractOrMinable = !!(_itemId && (DSPData.canBeExtracted[_itemId] || DSPData.canBeMined[_itemId]));
 
+		if (!_recipeId && _itemId) {
+			const defaultRecipeToProcureItem = get(FactoryGlobals.defaultRecipes)[_itemId];
+			if (!!defaultRecipeToProcureItem) _recipeId = defaultRecipeToProcureItem;
+		}
+
 		if (!_recipeId && !extractOrMinable) {
 			_recipeId = DSPData.alternativeRecipe[_itemId as number]?.[0];
 		}
@@ -329,15 +334,15 @@ export class RecipePlanner extends BasePlanner {
 	}
 
 	planFor(itemId: number) {
-		const ti = get(this.targetInterval);
+		const ti = derived(([this.timeSpend, this.targetInterval]), ([ts, ti] ) => ti === null ? ts : ti);
 		this.children.update(children => {
-			children.push(new RecipePlanner(undefined, itemId, this.requiredItemsPerInterval, ti ? this.targetInterval : this.timeSpend, this.depth + 1));
+			children.push(new RecipePlanner(undefined, itemId, this.requiredItemsPerInterval, ti , this.depth + 1));
 			return children;
 		});
 	}
 
 	dbd(targetDepth?: number) {
-		const ti = get(this.targetInterval);
+		const ti = derived(([this.timeSpend, this.targetInterval]), ([ts, ti] ) => ti === null ? ts : ti);
 
 		const children: RecipePlanner[] = [];
 		const childrenProvideItemsPerInterval: Record<number, number> = {};
@@ -347,7 +352,7 @@ export class RecipePlanner extends BasePlanner {
 				return;
 			}
 
-			const planner = new RecipePlanner(undefined, citemId, this.requiredItemsPerInterval,  ti ? this.targetInterval : this.timeSpend, this.depth + 1, targetDepth);
+			const planner = new RecipePlanner(undefined, citemId, this.requiredItemsPerInterval,  ti, this.depth + 1, targetDepth);
 			children.push(planner);
 			const providedItemsPerInterval = get(planner.providedItemsPerInterval);
 

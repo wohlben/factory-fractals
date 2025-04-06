@@ -3,21 +3,21 @@
 	import { FactoryGlobals } from '$lib/client/factory-globals';
 
 	let { planner } = $props<{ planner: RecipePlanner }>();
-	let { targetInterval, timeSpend, timeSpendChanged,  } = $derived(planner);
+	let { targetInterval, timeSpend, timeSpendChanged } = $derived(planner);
 	let { defaultInterval } = FactoryGlobals;
 
 
 	let intervalPicker = $state(false);
 	const ONE_MINUTE = 60 * 60;
 
-	const switchInterval = (interval: number|null) => {
+	const switchInterval = (interval: number | null) => {
 		planner.setInterval(interval);
 		intervalPicker = false;
 		defaultInterval.set(interval);
 		localStorage?.setItem('defaultInterval',
 			JSON.stringify({ interval })
 		);
-	}
+	};
 
 </script>
 {#if (intervalPicker)}
@@ -31,6 +31,7 @@
 		      <button class="px-1.5 py-2 multi hover:bg-slate-700" class:active={$targetInterval === ONE_MINUTE}
 									onclick={() => switchInterval(ONE_MINUTE)}>Minute</button>
 				    	<button class="px-1.5 py-2 multi hover:bg-slate-700" class:active={$targetInterval === 60}
+
 											onclick={() => switchInterval(60)}>Second</button>
 				</span>
 {:else}
@@ -50,10 +51,10 @@
 									class:hidden={$targetInterval !== ONE_MINUTE}
 									onclick={() => intervalPicker = true}>Minute</button>
 
-				    	<button class="px-1.5 py-2 multi hover:bg-slate-700 xl:hidden"
-											class:active={$targetInterval === 60}
-											class:hidden={$targetInterval !== 60}
-											onclick={() => intervalPicker = true}>Second</button>
+					<button class="px-1.5 py-2 multi hover:bg-slate-700 xl:hidden"
+									class:active={$targetInterval === 60}
+									class:hidden={$targetInterval !== 60}
+									onclick={() => intervalPicker = true}>Second</button>
 
 				<!-- desktop -->
 
@@ -68,9 +69,10 @@
 		      <button class="px-1.5 py-2 multi hover:bg-slate-700 hidden xl:inline"
 									class:active={$targetInterval === ONE_MINUTE}
 									onclick={() => switchInterval(ONE_MINUTE)}>Minute</button>
-				    	<button class="px-1.5 py-2 multi hover:bg-slate-700 hidden xl:inline"
-											class:active={$targetInterval === 60}
-											onclick={() => switchInterval(60)}>Second</button>
+
+					<button class="px-1.5 py-2 multi hover:bg-slate-700 hidden xl:inline"
+									class:active={$targetInterval === 60}
+									onclick={() => switchInterval(60)}>Second</button>
 			</span>
 
 			</span>

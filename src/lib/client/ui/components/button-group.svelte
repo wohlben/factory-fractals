@@ -8,7 +8,7 @@
 </script>
 
 <h4 class="py-2 dark:bg-slate-800 bg-slate-200 rounded-t-lg flex gap-2 justify-center  w-full items-center sticky top-0">
-	<span class>{label}</span>
+	<span>{label}</span>
 	<span>
 		{#each options as option}
 			<button class="px-4 py-2 first:rounded-l-lg last:rounded-r-lg  outline-gray-600 "

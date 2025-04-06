@@ -3,7 +3,7 @@
 	import { assets } from '$app/paths';
 	import { DSPData } from '$lib/client/dspdata';
 
-	let { itemId } = $props<{ itemId: number }>();
+	let { itemId, small } = $props<{ itemId: number, small?: boolean }>();
 
 	let item = $derived(DSPData.item[itemId]);
 
@@ -13,5 +13,5 @@
 </script>
 
 {#key itemId}
-	<img class="h-6" alt="" src={icon} />
+	<img class:h-6={small !== false} alt="" src={icon} />
 {/key}

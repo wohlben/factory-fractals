@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { RecipeType } from '$lib/client/dspdata';
+import { DSPData, type RecipeType } from '$lib/client/dspdata';
 
 const storedDefaultTiers = () => {
 	const storedItem = browser && localStorage?.getItem(`defaultTiers`);
@@ -29,10 +29,28 @@ const storedDefaultInterval = () => {
 	return writable(null);
 };
 
+const storedDefaultRecipe = () => {
+	const storedItem = browser && localStorage?.getItem(`defaultRecipes`);
+	const itemToDefaultRecipe: Record<number, number | null> = {};
+	if (storedItem) {
+		const storedValue = JSON.parse(storedItem);
+		Object.entries(storedValue).forEach(([itemIdS, recipeIdS]) => {
+			const itemId = Number(itemIdS);
+			const recipeId = recipeIdS && Number(recipeIdS);
+			if ((recipeId === null && (DSPData.canBeExtracted[itemId] || DSPData.canBeMined[itemId])) ||
+				recipeId && DSPData.relatedRecipes[itemId].has(recipeId as number)) {
+				itemToDefaultRecipe[itemId] = recipeId as number | null;
+			}
+		});
+	}
+	return writable(itemToDefaultRecipe);
+};
+
+
 const availableTiers = {
 	Smelt: [1, 2, 3],
 	Assemble: [0.75, 1, 1.5, 3],
-	Research: [1],
+	Research: [1, 3],
 	Refine: [1],
 	Chemical: [1, 2],
 	Particle: [1],
@@ -69,6 +87,7 @@ export const FactoryGlobals = {
 	proliferatorRecipe: {},
 	availableIntervals,
 	defaultInterval: storedDefaultInterval(),
+	defaultRecipes: storedDefaultRecipe(),
 	factoryItems: {
 		Smelt: {
 			[1]: 2302,
@@ -83,7 +102,7 @@ export const FactoryGlobals = {
 		},
 		Research: {
 			1: 2901,
-			2: 2902
+			3: 2902
 		},
 		Chemical: {
 			1: 2309,
