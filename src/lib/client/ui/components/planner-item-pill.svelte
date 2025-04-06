@@ -21,7 +21,7 @@
 	});
 </script>
 
-<button class:dark:hover:bg-red-700={!planner.amountEditable} disabled={!deletecb ||!recipe}
+<button class:dark:hover:bg-red-700={!planner.amountEditable} disabled={!deletecb ||!planner}
 				onclick={() => deletecb?.()} class:hover:bg-red-300={!planner.amountEditable}
 				class="dark:bg-slate-800 bg-slate-200  text-center rounded-r-lg  outline-slate-500"
 				class:outline-1={planner.amountEditable}>

@@ -9,6 +9,7 @@
 	import { derived, get } from 'svelte/store';
 	import Tally from '$lib/client/ui/components/tally.svelte';
 	import Dialog from '$lib/client/ui/components/dialog.svelte';
+	import IntervalPicker from '$lib/client/ui/components/interval-picker.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -18,9 +19,9 @@
 	let planner = $derived(new RecipePlanner(data.recipeId, undefined, undefined, undefined, undefined, data.depth, data.targetAmount));
 	let { targetInterval, recipe, timeSpend, timeSpendChanged, tier, children, header } = $derived(planner);
 
-	const ONE_MINUTE = 60 * 60;
 	let dialogOpen = $state(false);
 	let searchAbsolute = $state(false);
+	let tallyDialog = $state(false)
 
 
 	const applyToAll = (pnr?: RecipePlanner) => {
@@ -48,8 +49,7 @@
 
 {#if (dialogOpen)}
 	{#snippet dialogHeader()}
-		<span class="dark:bg-slate-700/70 bg-slate-300/70 w-full py-2 px-12">		Factory Globals
-</span>
+		<span class="dark:bg-slate-700/70 bg-slate-300/70 w-full py-2 px-12">		Factory Globals</span>
 	{/snippet}
 	<Dialog close={() => dialogOpen = false} header={dialogHeader}>
 		<div class="md:px-5 flex flex-col  gap-2 ">
@@ -76,23 +76,13 @@
 
 	<div class="max-w-2xl w-full lg:mx-0 mx-auto overflow-y-auto max-h-screen   scrollbar-thin">
 		<div class="flex  text-sm py-1 gap-2 sticky top-0 z-10 bg-slate-50/70 dark:bg-slate-950/70">
-		<span class="px-3 py-1 dark:bg-slate-800 bg-slate-200 rounded-r-lg">Items per
-			<span class="inline-flex">
-						<button class="px-1.5 py-2 multi hover:bg-slate-700" class:animate-flash={$timeSpendChanged}
-										class:active={$targetInterval === $timeSpend}
-										onclick={() => planner.setInterval(0)}>
-							Cycle ({ Math.round($timeSpend / 60 * 100) / 100 }s)
-						</button>
+			<IntervalPicker planner={planner} />
 
-		      <button class="px-1.5 py-2 multi hover:bg-slate-700" class:active={$targetInterval === ONE_MINUTE}
-									onclick={() => planner.setInterval(ONE_MINUTE)}>Minute</button>
-				{#if ($timeSpend !== 60) }
-				    	<button class="px-1.5 py-2 multi hover:bg-slate-700" class:active={$targetInterval === 60}
-											onclick={() => planner.setInterval(60)}>Second</button>
-					{/if}
-			</span>
-		</span>
 			<span class="px-3 py-3 flex-grow text-right"></span>
+			<button class="px-3 py-3  bg-slate-200 dark:hover:bg-slate-700 hover:bg-slate-300 rounded-lg lg:hidden"
+							class:dark:bg-slate-600={searchAbsolute} class:dark:bg-slate-800={!searchAbsolute}
+							onclick={() => tallyDialog = !tallyDialog}>{!tallyDialog ? '📃' : '✖️' }
+			</button>
 			<button class="px-3 py-3  bg-slate-200 dark:hover:bg-slate-700 hover:bg-slate-300 rounded-lg lg:hidden"
 							class:dark:bg-slate-600={searchAbsolute} class:dark:bg-slate-800={!searchAbsolute}
 							onclick={() => searchAbsolute = !searchAbsolute}>{!searchAbsolute ? '🔍' : '✖️' }
@@ -107,9 +97,12 @@
 		{/key}
 
 	</div>
-	{#key planner}
-		<Tally planner={planner} />
-	{/key}
+	<div class="md:hidden">
+		{#key planner}
+			<Tally planner={planner} />
+		{/key}
+	</div>
+
 
 </div>
 
@@ -125,5 +118,17 @@
 		<RecipeList recipeName={recipeName}></RecipeList>
 
 	</Dialog>
+{/if}
 
+{#if (tallyDialog)}
+	{#snippet dialogHeader()}
+		<span class="dark:bg-slate-700/70 bg-slate-300/70 w-full py-2 px-12">		Factory Globals</span>
+	{/snippet}
+	<Dialog close={() => tallyDialog = false} header={dialogHeader}>
+		{#key planner}
+
+		<Tally planner={planner} />
+		{/key}
+
+	</Dialog>
 {/if}

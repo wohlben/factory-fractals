@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { RecipeType } from '$lib/client/dspdata';
 
-const preValue = () => {
+const storedDefaultTiers = () => {
 	const storedItem = browser && localStorage?.getItem(`defaultTiers`);
 	if (storedItem) {
 		const storedValue: Record<RecipeType, number> = JSON.parse(storedItem);
@@ -18,16 +18,27 @@ const preValue = () => {
 	return undefined;
 };
 
+const storedDefaultInterval = () => {
+	const storedItem = browser && localStorage?.getItem(`defaultInterval`);
+	if (storedItem) {
+		const storedValue = JSON.parse(storedItem);
+		const interval = storedValue?.interval;
+		if (Object.values(availableIntervals).includes(interval))
+			return writable(interval);
+	}
+	return writable(null);
+};
+
 const availableTiers = {
-		Smelt: [1, 2, 3],
-		Assemble: [0.75, 1, 1.5, 3],
-		Research: [1],
-		Refine: [1],
-		Chemical: [1, 2],
-		Particle: [1],
-		Fractionate: [1],
-		Proliferator: [0, 0.125, 0.2, 0.25]
-	} as Record<RecipeType, number[]>
+	Smelt: [1, 2, 3],
+	Assemble: [0.75, 1, 1.5, 3],
+	Research: [1],
+	Refine: [1],
+	Chemical: [1, 2],
+	Particle: [1],
+	Fractionate: [1],
+	Proliferator: [0, 0.125, 0.2, 0.25]
+} as Record<RecipeType, number[]>;
 
 
 const defaultValues = {
@@ -41,8 +52,14 @@ const defaultValues = {
 	Proliferator: 0
 };
 
+const availableIntervals = {
+	cycle: null,
+	minute: 60 * 60,
+	second: 60
+};
+
 export const FactoryGlobals = {
-	defaultTier: preValue() ?? writable<Record<RecipeType, number>>(defaultValues),
+	defaultTier: storedDefaultTiers() ?? writable<Record<RecipeType, number>>(defaultValues),
 	availableTiers,
 	proliferatorUsage: {
 		[0.125]: 12,
@@ -50,6 +67,8 @@ export const FactoryGlobals = {
 		[0.25]: 60
 	} as const,
 	proliferatorRecipe: {},
+	availableIntervals,
+	defaultInterval: storedDefaultInterval(),
 	factoryItems: {
 		Smelt: {
 			[1]: 2302,
